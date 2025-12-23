@@ -3,6 +3,8 @@ import { StatsCard } from '@/components/StatsCard';
 import { TelegramUsersPanel } from '@/components/TelegramUsersPanel';
 import { BotCommandsPanel } from '@/components/BotCommandsPanel';
 import { CouponCodesPanel } from '@/components/CouponCodesPanel';
+import { PaymentMethodsPanel } from '@/components/PaymentMethodsPanel';
+import { DepositsPanel } from '@/components/DepositsPanel';
 import { MessagesPanel } from '@/components/MessagesPanel';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useTelegramUsers } from '@/hooks/useTelegramUsers';
@@ -61,6 +63,11 @@ const Index = () => {
           />
         </div>
 
+        {/* Deposits Panel */}
+        <div className="mb-6">
+          <DepositsPanel />
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Messages Panel - Takes 2 columns */}
           <div className="lg:col-span-2">
@@ -70,6 +77,7 @@ const Index = () => {
           {/* Right Sidebar - Bot Stats & Commands */}
           <div className="lg:col-span-1 space-y-6">
             <TelegramUsersPanel />
+            <PaymentMethodsPanel />
             <CouponCodesPanel />
             <BotCommandsPanel />
           </div>

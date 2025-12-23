@@ -13,14 +13,14 @@ type Language = 'en' | 'bn' | 'hi';
 
 const translations: Record<string, Record<Language, string>> = {
   welcome: {
-    en: "🎉 <b>Welcome!</b>\n\n💰 Your current balance: <b>{balance} credits</b>\n\n📌 <b>Available Commands:</b>\n/daily - Claim daily bonus (1 credit every 24 hours)\n/balance - Check your balance\n/referral - Get your referral link\n/redeem CODE - Redeem a coupon code\n/language - Change language",
-    bn: "🎉 <b>স্বাগতম!</b>\n\n💰 আপনার বর্তমান ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n\n📌 <b>উপলব্ধ কমান্ড:</b>\n/daily - ডেইলি বোনাস নিন (প্রতি ২৪ ঘন্টায় ১ ক্রেডিট)\n/balance - ব্যালেন্স দেখুন\n/referral - রেফারেল লিংক পান\n/redeem CODE - কুপন কোড রিডিম করুন\n/language - ভাষা পরিবর্তন করুন",
-    hi: "🎉 <b>स्वागत है!</b>\n\n💰 आपका वर्तमान बैलेंस: <b>{balance} क्रेडिट</b>\n\n📌 <b>उपलब्ध कमांड:</b>\n/daily - डेली बोनस लें (हर 24 घंटे में 1 क्रेडिट)\n/balance - बैलेंस देखें\n/referral - रेफरल लिंक पाएं\n/redeem CODE - कूपन कोड रिडीम करें\n/language - भाषा बदलें",
+    en: "🎉 <b>Welcome!</b>\n\n💰 Your current balance: <b>{balance} credits</b>\n\n📌 <b>Available Commands:</b>\n/daily - Claim daily bonus (1 credit every 24 hours)\n/balance - Check your balance\n/deposit - Deposit credits\n/referral - Get your referral link\n/redeem CODE - Redeem a coupon code\n/language - Change language",
+    bn: "🎉 <b>স্বাগতম!</b>\n\n💰 আপনার বর্তমান ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n\n📌 <b>উপলব্ধ কমান্ড:</b>\n/daily - ডেইলি বোনাস নিন (প্রতি ২৪ ঘন্টায় ১ ক্রেডিট)\n/balance - ব্যালেন্স দেখুন\n/deposit - ক্রেডিট জমা দিন\n/referral - রেফারেল লিংক পান\n/redeem CODE - কুপন কোড রিডিম করুন\n/language - ভাষা পরিবর্তন করুন",
+    hi: "🎉 <b>स्वागत है!</b>\n\n💰 आपका वर्तमान बैलेंस: <b>{balance} क्रेडिट</b>\n\n📌 <b>उपलब्ध कमांड:</b>\n/daily - डेली बोनस लें (हर 24 घंटे में 1 क्रेडिट)\n/balance - बैलेंस देखें\n/deposit - क्रेडिट जमा करें\n/referral - रेफरल लिंक पाएं\n/redeem CODE - कूपन कोड रिडीम करें\n/language - भाषा बदलें",
   },
   welcomeReferred: {
-    en: "🎉 <b>Welcome!</b>\n\n🎁 You joined via referral and got <b>+1 bonus credit!</b>\n💰 Your current balance: <b>{balance} credits</b>\n\n📌 <b>Available Commands:</b>\n/daily - Claim daily bonus (1 credit every 24 hours)\n/balance - Check your balance\n/referral - Get your referral link\n/redeem CODE - Redeem a coupon code\n/language - Change language",
-    bn: "🎉 <b>স্বাগতম!</b>\n\n🎁 আপনি রেফারেলের মাধ্যমে যোগ দিয়েছেন এবং <b>+১ বোনাস ক্রেডিট</b> পেয়েছেন!\n💰 আপনার বর্তমান ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n\n📌 <b>উপলব্ধ কমান্ড:</b>\n/daily - ডেইলি বোনাস নিন\n/balance - ব্যালেন্স দেখুন\n/referral - রেফারেল লিংক পান\n/redeem CODE - কুপন কোড রিডিম করুন\n/language - ভাষা পরিবর্তন করুন",
-    hi: "🎉 <b>स्वागत है!</b>\n\n🎁 आप रेफरल से जुड़े और <b>+1 बोनस क्रेडिट</b> मिला!\n💰 आपका बैलेंस: <b>{balance} क्रेडिट</b>\n\n📌 <b>उपलब्ध कमांड:</b>\n/daily - डेली बोनस लें\n/balance - बैलेंस देखें\n/referral - रेफरल लिंक पाएं\n/redeem CODE - कूपन कोड रिडीम करें\n/language - भाषा बदलें",
+    en: "🎉 <b>Welcome!</b>\n\n🎁 You joined via referral and got <b>+1 bonus credit!</b>\n💰 Your current balance: <b>{balance} credits</b>\n\n📌 <b>Available Commands:</b>\n/daily - Claim daily bonus (1 credit every 24 hours)\n/balance - Check your balance\n/deposit - Deposit credits\n/referral - Get your referral link\n/redeem CODE - Redeem a coupon code\n/language - Change language",
+    bn: "🎉 <b>স্বাগতম!</b>\n\n🎁 আপনি রেফারেলের মাধ্যমে যোগ দিয়েছেন এবং <b>+১ বোনাস ক্রেডিট</b> পেয়েছেন!\n💰 আপনার বর্তমান ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n\n📌 <b>উপলব্ধ কমান্ড:</b>\n/daily - ডেইলি বোনাস নিন\n/balance - ব্যালেন্স দেখুন\n/deposit - ক্রেডিট জমা দিন\n/referral - রেফারেল লিংক পান\n/redeem CODE - কুপন কোড রিডিম করুন\n/language - ভাষা পরিবর্তন করুন",
+    hi: "🎉 <b>स्वागत है!</b>\n\n🎁 आप रेफरल से जुड़े और <b>+1 बोनस क्रेडिट</b> मिला!\n💰 आपका बैलेंस: <b>{balance} क्रेडिट</b>\n\n📌 <b>उपलब्ध कमांड:</b>\n/daily - डेली बोनस लें\n/balance - बैलेंस देखें\n/deposit - क्रेडिट जमा करें\n/referral - रेफरल लिंक पाएं\n/redeem CODE - कूपन कोड रिडीम करें\n/language - भाषा बदलें",
   },
   balance: {
     en: "💰 Your current balance: <b>{balance} credits</b>",
@@ -86,6 +86,41 @@ const translations: Record<string, Record<Language, string>> = {
     en: "❌ This coupon code has reached its maximum usage limit.",
     bn: "❌ এই কুপন কোড সর্বাধিক ব্যবহার সীমায় পৌঁছে গেছে।",
     hi: "❌ इस कूपन कोड की अधिकतम उपयोग सीमा पूरी हो गई है।",
+  },
+  depositMenu: {
+    en: "💳 <b>Deposit Credits</b>\n\n📱 <b>Available Payment Methods:</b>\n{methods}\n\n📝 <b>How to deposit:</b>\n1. Send money to one of the above accounts\n2. Use: /pay METHOD AMOUNT TRX_ID\n\nExample: /pay bkash 100 ABC123XYZ",
+    bn: "💳 <b>ক্রেডিট জমা দিন</b>\n\n📱 <b>উপলব্ধ পেমেন্ট মেথড:</b>\n{methods}\n\n📝 <b>জমা দেওয়ার নিয়ম:</b>\n১. উপরের যেকোনো একাউন্টে টাকা পাঠান\n২. ব্যবহার করুন: /pay মেথড পরিমাণ ট্রানজেকশন_আইডি\n\nউদাহরণ: /pay bkash 100 ABC123XYZ",
+    hi: "💳 <b>क्रेडिट जमा करें</b>\n\n📱 <b>उपलब्ध पेमेंट मेथड:</b>\n{methods}\n\n📝 <b>जमा करने का तरीका:</b>\n1. ऊपर दिए गए किसी खाते में पैसे भेजें\n2. उपयोग करें: /pay METHOD AMOUNT TRX_ID\n\nउदाहरण: /pay bkash 100 ABC123XYZ",
+  },
+  depositNoMethods: {
+    en: "❌ No payment methods available at the moment. Please try again later.",
+    bn: "❌ এই মুহূর্তে কোন পেমেন্ট মেথড নেই। পরে আবার চেষ্টা করুন।",
+    hi: "❌ इस समय कोई पेमेंट मेथड उपलब्ध नहीं है। कृपया बाद में प्रयास करें।",
+  },
+  depositUsage: {
+    en: "📝 <b>Deposit Usage:</b>\n\nUse: /pay METHOD AMOUNT TRX_ID\n\nMethods: bkash, nagad, rocket, binance\n\nExample: /pay bkash 100 ABC123XYZ",
+    bn: "📝 <b>ডিপোজিট নিয়ম:</b>\n\nব্যবহার: /pay মেথড পরিমাণ ট্রানজেকশন_আইডি\n\nমেথড: bkash, nagad, rocket, binance\n\nউদাহরণ: /pay bkash 100 ABC123XYZ",
+    hi: "📝 <b>डिपॉजिट नियम:</b>\n\nउपयोग: /pay METHOD AMOUNT TRX_ID\n\nमेथड: bkash, nagad, rocket, binance\n\nउदाहरण: /pay bkash 100 ABC123XYZ",
+  },
+  depositInvalidMethod: {
+    en: "❌ Invalid payment method. Available: bkash, nagad, rocket, binance",
+    bn: "❌ ভুল পেমেন্ট মেথড। উপলব্ধ: bkash, nagad, rocket, binance",
+    hi: "❌ गलत पेमेंट मेथड। उपलब्ध: bkash, nagad, rocket, binance",
+  },
+  depositInvalidAmount: {
+    en: "❌ Invalid amount. Please enter a valid number.",
+    bn: "❌ ভুল পরিমাণ। সঠিক সংখ্যা দিন।",
+    hi: "❌ गलत राशि। कृपया सही संख्या दर्ज करें।",
+  },
+  depositSuccess: {
+    en: "✅ <b>Deposit Request Submitted!</b>\n\n💳 Method: <b>{method}</b>\n💰 Amount: <b>৳{amount}</b>\n🔢 Transaction ID: <b>{txnId}</b>\n\n⏳ Your request is being reviewed. Credits will be added after verification.",
+    bn: "✅ <b>ডিপোজিট রিকোয়েস্ট জমা হয়েছে!</b>\n\n💳 মেথড: <b>{method}</b>\n💰 পরিমাণ: <b>৳{amount}</b>\n🔢 ট্রানজেকশন আইডি: <b>{txnId}</b>\n\n⏳ আপনার রিকোয়েস্ট রিভিউ করা হচ্ছে। ভেরিফিকেশনের পর ক্রেডিট যোগ হবে।",
+    hi: "✅ <b>डिपॉजिट रिक्वेस्ट जमा हुई!</b>\n\n💳 मेथड: <b>{method}</b>\n💰 राशि: <b>৳{amount}</b>\n🔢 ट्रांजेक्शन ID: <b>{txnId}</b>\n\n⏳ आपकी रिक्वेस्ट रिव्यू हो रही है। वेरिफिकेशन के बाद क्रेडिट जोड़े जाएंगे।",
+  },
+  depositError: {
+    en: "❌ Error submitting deposit request. Please try again later.",
+    bn: "❌ ডিপোজিট রিকোয়েস্ট জমা দিতে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন।",
+    hi: "❌ डिपॉजिट रिक्वेस्ट जमा करने में त्रुटि। कृपया बाद में पुनः प्रयास करें।",
   },
 };
 
@@ -384,6 +419,123 @@ serve(async (req) => {
           code: coupon.code,
           credits: coupon.credits,
           balance: newBalance,
+        }));
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Handle /deposit command
+      if (command === 'deposit') {
+        // Get active payment methods
+        const { data: paymentMethods } = await supabase
+          .from('payment_methods')
+          .select('*')
+          .eq('is_active', true);
+
+        if (!paymentMethods || paymentMethods.length === 0) {
+          await sendTelegramMessage(chatId, t('depositNoMethods', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const methodTypeLabels: Record<string, string> = {
+          bkash: '📱 বিকাশ',
+          nagad: '💳 নগদ',
+          rocket: '🚀 রকেট',
+          binance: '₿ Binance',
+        };
+
+        const methodsList = paymentMethods.map((pm: { type: string; name: string; account_number: string; account_name: string | null; instructions: string | null }) => {
+          let info = `${methodTypeLabels[pm.type] || pm.type}\n   📍 ${pm.name}\n   📞 ${pm.account_number}`;
+          if (pm.account_name) info += `\n   👤 ${pm.account_name}`;
+          if (pm.instructions) info += `\n   ℹ️ ${pm.instructions}`;
+          return info;
+        }).join('\n\n');
+
+        await sendTelegramMessage(chatId, t('depositMenu', userLang, { methods: methodsList }));
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Handle /pay command for deposit
+      if (command === 'pay') {
+        const parts = messageText.split(' ');
+        
+        if (parts.length < 4) {
+          await sendTelegramMessage(chatId, t('depositUsage', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const methodType = parts[1].toLowerCase();
+        const amount = parseFloat(parts[2]);
+        const txnId = parts.slice(3).join(' ');
+
+        const validMethods = ['bkash', 'nagad', 'rocket', 'binance'];
+        if (!validMethods.includes(methodType)) {
+          await sendTelegramMessage(chatId, t('depositInvalidMethod', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        if (isNaN(amount) || amount <= 0) {
+          await sendTelegramMessage(chatId, t('depositInvalidAmount', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Get the payment method
+        const { data: paymentMethod } = await supabase
+          .from('payment_methods')
+          .select('id, name')
+          .eq('type', methodType)
+          .eq('is_active', true)
+          .limit(1)
+          .single();
+
+        if (!paymentMethod) {
+          await sendTelegramMessage(chatId, t('depositInvalidMethod', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Create deposit request
+        const { error: depositError } = await supabase
+          .from('deposits')
+          .insert({
+            telegram_user_id: telegramUser.id,
+            amount,
+            payment_method_id: paymentMethod.id,
+            transaction_id: txnId,
+            status: 'pending',
+          });
+
+        if (depositError) {
+          console.error('Deposit insert error:', depositError);
+          await sendTelegramMessage(chatId, t('depositError', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const methodLabels: Record<string, string> = {
+          bkash: 'বিকাশ',
+          nagad: 'নগদ',
+          rocket: 'রকেট',
+          binance: 'Binance',
+        };
+
+        await sendTelegramMessage(chatId, t('depositSuccess', userLang, {
+          method: methodLabels[methodType] || methodType,
+          amount,
+          txnId,
         }));
         return new Response(JSON.stringify({ ok: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },

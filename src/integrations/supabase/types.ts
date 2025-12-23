@@ -103,6 +103,89 @@ export type Database = {
           },
         ]
       }
+      deposits: {
+        Row: {
+          admin_note: string | null
+          amount: number
+          created_at: string
+          id: string
+          payment_method_id: string
+          processed_at: string | null
+          processed_by: string | null
+          status: string
+          telegram_user_id: number
+          transaction_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          amount: number
+          created_at?: string
+          id?: string
+          payment_method_id: string
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          telegram_user_id: number
+          transaction_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          payment_method_id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          telegram_user_id?: number
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deposits_payment_method_id_fkey"
+            columns: ["payment_method_id"]
+            isOneToOne: false
+            referencedRelation: "payment_methods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_methods: {
+        Row: {
+          account_name: string | null
+          account_number: string
+          created_at: string
+          id: string
+          instructions: string | null
+          is_active: boolean
+          name: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          account_name?: string | null
+          account_number: string
+          created_at?: string
+          id?: string
+          instructions?: string | null
+          is_active?: boolean
+          name: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          account_name?: string | null
+          account_number?: string
+          created_at?: string
+          id?: string
+          instructions?: string | null
+          is_active?: boolean
+          name?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
