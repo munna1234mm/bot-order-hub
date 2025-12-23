@@ -54,7 +54,7 @@ export const CanvaProRequestsPanel = () => {
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
             <Mail className="h-5 w-5 text-primary" />
-            Canva Pro Requests
+            Canva Pro (12 Month) Requests
             {pendingCount > 0 && (
               <Badge className="bg-primary/20 text-primary border-0">{pendingCount} pending</Badge>
             )}

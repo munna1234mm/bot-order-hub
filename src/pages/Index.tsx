@@ -9,6 +9,7 @@ import { MessagesPanel } from '@/components/MessagesPanel';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import AdminTelegramIdsPanel from '@/components/AdminTelegramIdsPanel';
 import { CanvaProRequestsPanel } from '@/components/CanvaProRequestsPanel';
+import { ServicesPanel } from '@/components/ServicesPanel';
 import { useTelegramUsers } from '@/hooks/useTelegramUsers';
 import { useTelegramMessages } from '@/hooks/useTelegramMessages';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -73,6 +74,11 @@ const Index = () => {
         {/* Canva Pro Requests Panel */}
         <div className="mb-6">
           <CanvaProRequestsPanel />
+        </div>
+
+        {/* Services Panel */}
+        <div className="mb-6">
+          <ServicesPanel />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

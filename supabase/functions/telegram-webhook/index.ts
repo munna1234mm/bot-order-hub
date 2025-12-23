@@ -168,9 +168,9 @@ const translations: Record<string, Record<Language, string>> = {
     hi: "❌ इस टेलीग्राम ID से कोई यूजर नहीं मिला।",
   },
   canvaProAskGmail: {
-    en: "📧 <b>Canva Pro Request</b>\n\n💰 Cost: <b>5 credits</b>\n\nPlease send your Gmail address (without password) to get Canva Pro access.\n\nExample: yourname@gmail.com",
-    bn: "📧 <b>Canva Pro রিকোয়েস্ট</b>\n\n💰 খরচ: <b>৫ ক্রেডিট</b>\n\nCanva Pro অ্যাক্সেস পেতে আপনার জিমেইল অ্যাড্রেস পাঠান (পাসওয়ার্ড ছাড়া)।\n\nউদাহরণ: yourname@gmail.com",
-    hi: "📧 <b>Canva Pro रिक्वेस्ट</b>\n\n💰 लागत: <b>5 क्रेडिट</b>\n\nCanva Pro एक्सेस पाने के लिए अपना Gmail पता भेजें (पासवर्ड के बिना)।\n\nउदाहरण: yourname@gmail.com",
+    en: "📧 <b>Canva Pro (12 Month) Request</b>\n\n💰 Cost: <b>5 credits</b>\n📅 Duration: <b>12 Months</b>\n\nPlease send your Gmail address (without password) to get Canva Pro access.\n\nExample: yourname@gmail.com",
+    bn: "📧 <b>Canva Pro (১২ মাস) রিকোয়েস্ট</b>\n\n💰 খরচ: <b>৫ ক্রেডিট</b>\n📅 মেয়াদ: <b>১২ মাস</b>\n\nCanva Pro অ্যাক্সেস পেতে আপনার জিমেইল অ্যাড্রেস পাঠান (পাসওয়ার্ড ছাড়া)।\n\nউদাহরণ: yourname@gmail.com",
+    hi: "📧 <b>Canva Pro (12 महीने) रिक्वेस्ट</b>\n\n💰 लागत: <b>5 क्रेडिट</b>\n📅 अवधि: <b>12 महीने</b>\n\nCanva Pro एक्सेस पाने के लिए अपना Gmail पता भेजें (पासवर्ड के बिना)।\n\nउदाहरण: yourname@gmail.com",
   },
   canvaProInsufficientBalance: {
     en: "❌ <b>Insufficient Balance!</b>\n\n💰 Your balance: <b>{balance} credits</b>\n📌 Required: <b>5 credits</b>\n\nPlease deposit more credits first using /deposit",
@@ -193,9 +193,9 @@ const translations: Record<string, Record<Language, string>> = {
     hi: "❌ गलत Gmail पता। कृपया सही Gmail पता भेजें।\n\nउदाहरण: yourname@gmail.com",
   },
   canvaProApproved: {
-    en: "🎉 <b>Canva Pro Approved!</b>\n\n✅ Check your Gmail! You have been given Canva Pro access.\n💰 5 credits have been deducted from your balance.",
-    bn: "🎉 <b>Canva Pro অনুমোদিত!</b>\n\n✅ আপনার জিমেইল চেক করুন! আপনাকে Canva Pro দেওয়া হয়েছে।\n💰 আপনার ব্যালেন্স থেকে ৫ ক্রেডিট কেটে নেওয়া হয়েছে।",
-    hi: "🎉 <b>Canva Pro स्वीकृत!</b>\n\n✅ अपना Gmail चेक करें! आपको Canva Pro एक्सेस दिया गया है।\n💰 आपके बैलेंस से 5 क्रेडिट काटे गए हैं।",
+    en: "🎉 <b>Canva Pro (12 Month) Approved!</b>\n\n✅ Your account has been sent! Please check your Gmail inbox.\n📅 Validity: <b>12 Months</b>\n💰 5 credits have been deducted from your balance.",
+    bn: "🎉 <b>Canva Pro (১২ মাস) অনুমোদিত!</b>\n\n✅ আপনার অ্যাকাউন্ট পাঠানো হয়েছে! অনুগ্রহ করে আপনার জিমেইলের ইনবক্স চেক করুন।\n📅 মেয়াদ: <b>১২ মাস</b>\n💰 আপনার ব্যালেন্স থেকে ৫ ক্রেডিট কেটে নেওয়া হয়েছে।",
+    hi: "🎉 <b>Canva Pro (12 महीने) स्वीकृत!</b>\n\n✅ आपका अकाउंट भेज दिया गया है! कृपया अपना Gmail इनबॉक्स चेक करें।\n📅 वैधता: <b>12 महीने</b>\n💰 आपके बैलेंस से 5 क्रेडिट काटे गए हैं।",
   },
   canvaProAdminNotification: {
     en: "🔔 <b>New Canva Pro Request!</b>\n\n👤 User: {userName} (@{username})\n🆔 Telegram ID: {telegramId}\n📧 Gmail: {gmail}\n\n⏳ Awaiting approval",
