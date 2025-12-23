@@ -41,6 +41,36 @@ export type Database = {
         }
         Relationships: []
       }
+      telegram_users: {
+        Row: {
+          created_at: string
+          first_name: string | null
+          id: string
+          last_active_at: string
+          last_name: string | null
+          telegram_id: number
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_active_at?: string
+          last_name?: string | null
+          telegram_id: number
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_active_at?: string
+          last_name?: string | null
+          telegram_id?: number
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
