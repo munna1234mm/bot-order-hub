@@ -37,9 +37,22 @@ export const DepositsPanel = () => {
     setIsApproveDialogOpen(true);
   };
 
+  const getDepositApprovalMessage = (credits: number, language: string) => {
+    const messages = {
+      en: `✅ ${credits} credits have been added to your account.\n\nUse /balance command to check your balance.`,
+      bn: `✅ আপনার অ্যাকাউন্টে ${credits} ক্রেডিট জমা হয়েছে।\n\nআপনার ব্যালেন্স চেক করতে /balance কমান্ড ব্যবহার করুন।`,
+      hi: `✅ आपके अकाउंट में ${credits} क्रेडिट जमा हो गए हैं।\n\nअपना बैलेंस चेक करने के लिए /balance कमांड का उपयोग करें।`
+    };
+    return messages[language as keyof typeof messages] || messages.en;
+  };
+
   const handleConfirmApprove = async () => {
     if (selectedDeposit && creditAmount) {
       const creditAmt = Number(creditAmount);
+      
+      // Get user's language preference
+      const user = users.find(u => u.telegram_id === selectedDeposit.telegram_user_id);
+      const userLanguage = user?.language || 'en';
       
       approveDeposit.mutate({
         id: selectedDeposit.id,
@@ -47,9 +60,9 @@ export const DepositsPanel = () => {
         amount: creditAmt
       }, {
         onSuccess: async () => {
-          // Send Telegram notification to user
+          // Send Telegram notification to user in their preferred language
           try {
-            const message = `✅ আপনার অ্যাকাউন্টে ${creditAmt} ক্রেডিট জমা হয়েছে।\n\nআপনার ব্যালেন্স চেক করতে /balance কমান্ড ব্যবহার করুন।`;
+            const message = getDepositApprovalMessage(creditAmt, userLanguage);
             
             await supabase.functions.invoke('send-telegram-message', {
               body: {
