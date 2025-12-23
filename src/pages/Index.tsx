@@ -4,7 +4,7 @@ import { StatsCard } from '@/components/StatsCard';
 import { OrdersTable } from '@/components/OrdersTable';
 import { OrderDetails } from '@/components/OrderDetails';
 import { StatusFilter } from '@/components/StatusFilter';
-import { OnlineUsersPanel } from '@/components/OnlineUsersPanel';
+import { TelegramUsersPanel } from '@/components/TelegramUsersPanel';
 import { mockOrders, getOrderStats, Order, OrderStatus } from '@/lib/mockData';
 import { Package, Clock, CheckCircle, DollarSign } from 'lucide-react';
 
@@ -109,7 +109,7 @@ const Index = () => {
 
           {/* Right Sidebar - Live Users */}
           <div className="lg:col-span-1">
-            <OnlineUsersPanel />
+            <TelegramUsersPanel />
           </div>
         </div>
       </main>
