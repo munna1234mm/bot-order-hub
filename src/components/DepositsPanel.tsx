@@ -9,6 +9,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CheckCircle, XCircle, Clock, Banknote } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { format } from 'date-fns';
 
 const statusConfig = {
@@ -35,13 +37,33 @@ export const DepositsPanel = () => {
     setIsApproveDialogOpen(true);
   };
 
-  const handleConfirmApprove = () => {
+  const handleConfirmApprove = async () => {
     if (selectedDeposit && creditAmount) {
+      const creditAmt = Number(creditAmount);
+      
       approveDeposit.mutate({
         id: selectedDeposit.id,
         telegram_user_id: selectedDeposit.telegram_user_id,
-        amount: Number(creditAmount)
+        amount: creditAmt
+      }, {
+        onSuccess: async () => {
+          // Send Telegram notification to user
+          try {
+            const message = `✅ আপনার অ্যাকাউন্টে ${creditAmt} ক্রেডিট জমা হয়েছে।\n\nআপনার ব্যালেন্স চেক করতে /balance কমান্ড ব্যবহার করুন।`;
+            
+            await supabase.functions.invoke('send-telegram-message', {
+              body: {
+                chatId: selectedDeposit.telegram_user_id,
+                message
+              }
+            });
+          } catch (error) {
+            console.error('Failed to send Telegram notification:', error);
+            toast.error('টেলিগ্রাম মেসেজ পাঠাতে সমস্যা হয়েছে');
+          }
+        }
       });
+      
       setIsApproveDialogOpen(false);
       setSelectedDeposit(null);
       setCreditAmount('');
