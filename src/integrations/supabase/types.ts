@@ -97,28 +97,34 @@ export type Database = {
       }
       telegram_users: {
         Row: {
+          balance: number
           created_at: string
           first_name: string | null
           id: string
           last_active_at: string
+          last_daily_claim: string | null
           last_name: string | null
           telegram_id: number
           username: string | null
         }
         Insert: {
+          balance?: number
           created_at?: string
           first_name?: string | null
           id?: string
           last_active_at?: string
+          last_daily_claim?: string | null
           last_name?: string | null
           telegram_id: number
           username?: string | null
         }
         Update: {
+          balance?: number
           created_at?: string
           first_name?: string | null
           id?: string
           last_active_at?: string
+          last_daily_claim?: string | null
           last_name?: string | null
           telegram_id?: number
           username?: string | null

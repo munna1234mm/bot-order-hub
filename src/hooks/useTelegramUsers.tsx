@@ -9,6 +9,8 @@ interface TelegramUser {
   username: string | null;
   last_active_at: string;
   created_at: string;
+  balance: number;
+  last_daily_claim: string | null;
 }
 
 export function useTelegramUsers() {
