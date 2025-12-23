@@ -5,6 +5,7 @@ import { OrdersTable } from '@/components/OrdersTable';
 import { OrderDetails } from '@/components/OrderDetails';
 import { StatusFilter } from '@/components/StatusFilter';
 import { TelegramUsersPanel } from '@/components/TelegramUsersPanel';
+import { BotCommandsPanel } from '@/components/BotCommandsPanel';
 import { mockOrders, getOrderStats, Order, OrderStatus } from '@/lib/mockData';
 import { Package, Clock, CheckCircle, DollarSign } from 'lucide-react';
 
@@ -107,9 +108,10 @@ const Index = () => {
             />
           </div>
 
-          {/* Right Sidebar - Live Users */}
-          <div className="lg:col-span-1">
+          {/* Right Sidebar - Bot Stats & Commands */}
+          <div className="lg:col-span-1 space-y-6">
             <TelegramUsersPanel />
+            <BotCommandsPanel />
           </div>
         </div>
       </main>

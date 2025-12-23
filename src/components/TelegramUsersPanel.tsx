@@ -1,10 +1,12 @@
 import { useTelegramUsers } from '@/hooks/useTelegramUsers';
-import { Users, Circle, Bot } from 'lucide-react';
+import { useTelegramMessages } from '@/hooks/useTelegramMessages';
+import { Bot, Circle, MessageSquare, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 
 export function TelegramUsersPanel() {
   const { users, activeUsers, loading } = useTelegramUsers();
+  const { totalCount: messageCount } = useTelegramMessages();
 
   const getDisplayName = (user: typeof users[0]) => {
     if (user.first_name && user.last_name) {
@@ -35,7 +37,25 @@ export function TelegramUsersPanel() {
         </div>
       </div>
 
-      <div className="space-y-3 max-h-[300px] overflow-y-auto">
+      {/* Stats Row */}
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="flex items-center gap-2 rounded-lg bg-muted/50 p-3">
+          <Users className="h-4 w-4 text-primary" />
+          <div>
+            <p className="text-lg font-bold text-foreground">{users.length}</p>
+            <p className="text-[10px] text-muted-foreground">Total Users</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 rounded-lg bg-muted/50 p-3">
+          <MessageSquare className="h-4 w-4 text-primary" />
+          <div>
+            <p className="text-lg font-bold text-foreground">{messageCount}</p>
+            <p className="text-[10px] text-muted-foreground">Messages</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-3 max-h-[250px] overflow-y-auto">
         {loading ? (
           <p className="text-sm text-muted-foreground text-center py-4">
             Loading...

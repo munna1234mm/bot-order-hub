@@ -6,8 +6,23 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN');
+
+async function sendTelegramMessage(chatId: number, text: string) {
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: text,
+      parse_mode: 'HTML',
+    }),
+  });
+  return response.json();
+}
+
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -20,7 +35,6 @@ serve(async (req) => {
     const update = await req.json();
     console.log('Telegram update received:', JSON.stringify(update));
 
-    // Extract user info from the message
     const message = update.message || update.edited_message || update.callback_query?.message;
     
     if (!message?.from) {
@@ -31,10 +45,14 @@ serve(async (req) => {
     }
 
     const telegramUser = message.from;
+    const chatId = message.chat.id;
+    const messageText = message.text || '';
+    
     console.log('Telegram user:', JSON.stringify(telegramUser));
+    console.log('Message:', messageText);
 
     // Upsert user into database
-    const { data, error } = await supabase
+    const { error: userError } = await supabase
       .from('telegram_users')
       .upsert({
         telegram_id: telegramUser.id,
@@ -44,15 +62,42 @@ serve(async (req) => {
         last_active_at: new Date().toISOString(),
       }, {
         onConflict: 'telegram_id',
-      })
-      .select();
+      });
 
-    if (error) {
-      console.error('Database error:', error);
-      throw error;
+    if (userError) {
+      console.error('User upsert error:', userError);
     }
 
-    console.log('User upserted:', data);
+    // Save message to database
+    const { error: msgError } = await supabase
+      .from('telegram_messages')
+      .insert({
+        telegram_user_id: telegramUser.id,
+        message_text: messageText,
+        message_type: message.photo ? 'photo' : message.document ? 'document' : 'text',
+        chat_id: chatId,
+      });
+
+    if (msgError) {
+      console.error('Message insert error:', msgError);
+    }
+
+    // Check for command and send auto-reply
+    if (messageText.startsWith('/')) {
+      const command = messageText.split(' ')[0].toLowerCase().replace('/', '');
+      
+      const { data: commandData } = await supabase
+        .from('bot_commands')
+        .select('response')
+        .eq('command', command)
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (commandData?.response) {
+        console.log('Sending auto-reply for command:', command);
+        await sendTelegramMessage(chatId, commandData.response);
+      }
+    }
 
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

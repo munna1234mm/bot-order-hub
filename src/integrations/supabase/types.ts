@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      bot_commands: {
+        Row: {
+          command: string
+          created_at: string
+          id: string
+          is_active: boolean
+          response: string
+          updated_at: string
+        }
+        Insert: {
+          command: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          response: string
+          updated_at?: string
+        }
+        Update: {
+          command?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          response?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -38,6 +65,33 @@ export type Database = {
           id?: string
           name?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      telegram_messages: {
+        Row: {
+          chat_id: number
+          created_at: string
+          id: string
+          message_text: string | null
+          message_type: string | null
+          telegram_user_id: number
+        }
+        Insert: {
+          chat_id: number
+          created_at?: string
+          id?: string
+          message_text?: string | null
+          message_type?: string | null
+          telegram_user_id: number
+        }
+        Update: {
+          chat_id?: number
+          created_at?: string
+          id?: string
+          message_text?: string | null
+          message_type?: string | null
+          telegram_user_id?: number
         }
         Relationships: []
       }
