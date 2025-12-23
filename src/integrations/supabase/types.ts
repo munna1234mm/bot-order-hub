@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_telegram_ids: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string | null
+          telegram_chat_id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string | null
+          telegram_chat_id: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string | null
+          telegram_chat_id?: number
+        }
+        Relationships: []
+      }
       bot_commands: {
         Row: {
           command: string

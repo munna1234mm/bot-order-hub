@@ -122,6 +122,26 @@ const translations: Record<string, Record<Language, string>> = {
     bn: "❌ ডিপোজিট রিকোয়েস্ট জমা দিতে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন।",
     hi: "❌ डिपॉजिट रिक्वेस्ट जमा करने में त्रुटि। कृपया बाद में पुनः प्रयास करें।",
   },
+  topUsage: {
+    en: "📊 <b>Leaderboard</b>\n\nUse:\n/top balance - Top users by credits\n/top referrals - Top users by referrals",
+    bn: "📊 <b>লিডারবোর্ড</b>\n\nব্যবহার:\n/top balance - ক্রেডিট অনুযায়ী টপ ইউজার\n/top referrals - রেফারেল অনুযায়ী টপ ইউজার",
+    hi: "📊 <b>लीडरबोर्ड</b>\n\nउपयोग:\n/top balance - क्रेडिट के अनुसार टॉप यूजर\n/top referrals - रेफरल के अनुसार टॉप यूजर",
+  },
+  topBalance: {
+    en: "🏆 <b>Top Users by Credits</b>\n\n{list}",
+    bn: "🏆 <b>ক্রেডিট অনুযায়ী টপ ইউজার</b>\n\n{list}",
+    hi: "🏆 <b>क्रेडिट के अनुसार टॉप यूजर</b>\n\n{list}",
+  },
+  topReferrals: {
+    en: "🏆 <b>Top Users by Referrals</b>\n\n{list}",
+    bn: "🏆 <b>রেফারেল অনুযায়ী টপ ইউজার</b>\n\n{list}",
+    hi: "🏆 <b>रेफरल के अनुसार टॉप यूजर</b>\n\n{list}",
+  },
+  adminDepositNotification: {
+    en: "🔔 <b>New Deposit Request!</b>\n\n👤 User: {userName} (@{username})\n🆔 Telegram ID: {telegramId}\n💳 Method: {method}\n💰 Amount: ৳{amount}\n🔢 TXN ID: {txnId}\n\n⏳ Awaiting approval",
+    bn: "🔔 <b>নতুন ডিপোজিট রিকোয়েস্ট!</b>\n\n👤 ইউজার: {userName} (@{username})\n🆔 টেলিগ্রাম ID: {telegramId}\n💳 মেথড: {method}\n💰 পরিমাণ: ৳{amount}\n🔢 TXN ID: {txnId}\n\n⏳ অ্যাপ্রুভাল পেন্ডিং",
+    hi: "🔔 <b>नई डिपॉजिट रिक्वेस्ट!</b>\n\n👤 यूजर: {userName} (@{username})\n🆔 टेलीग्राम ID: {telegramId}\n💳 मेथड: {method}\n💰 राशि: ৳{amount}\n🔢 TXN ID: {txnId}\n\n⏳ अप्रूवल पेंडिंग",
+  },
 };
 
 function t(key: string, lang: Language, replacements: Record<string, string | number> = {}): string {
@@ -532,11 +552,85 @@ serve(async (req) => {
           binance: 'Binance',
         };
 
+        // Send notification to all active admins
+        const { data: adminIds } = await supabase
+          .from('admin_telegram_ids')
+          .select('telegram_chat_id')
+          .eq('is_active', true);
+
+        if (adminIds && adminIds.length > 0) {
+          const userName = telegramUser.first_name || 'Unknown';
+          const username = telegramUser.username || 'no_username';
+          
+          for (const admin of adminIds) {
+            await sendTelegramMessage(admin.telegram_chat_id, t('adminDepositNotification', 'en', {
+              userName,
+              username,
+              telegramId: telegramUser.id,
+              method: methodLabels[methodType] || methodType,
+              amount,
+              txnId,
+            }));
+          }
+        }
+
         await sendTelegramMessage(chatId, t('depositSuccess', userLang, {
           method: methodLabels[methodType] || methodType,
           amount,
           txnId,
         }));
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Handle /top command for leaderboard
+      if (command === 'top') {
+        const subCommand = messageText.split(' ')[1]?.toLowerCase();
+
+        if (!subCommand || (subCommand !== 'balance' && subCommand !== 'referrals')) {
+          await sendTelegramMessage(chatId, t('topUsage', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        if (subCommand === 'balance') {
+          const { data: topUsers } = await supabase
+            .from('telegram_users')
+            .select('first_name, username, balance')
+            .order('balance', { ascending: false })
+            .limit(10);
+
+          if (topUsers && topUsers.length > 0) {
+            const medals = ['🥇', '🥈', '🥉'];
+            const list = topUsers.map((user, index) => {
+              const medal = medals[index] || `${index + 1}.`;
+              const name = user.first_name || user.username || 'Unknown';
+              return `${medal} ${name} - <b>${user.balance}</b> credits`;
+            }).join('\n');
+
+            await sendTelegramMessage(chatId, t('topBalance', userLang, { list }));
+          }
+        } else if (subCommand === 'referrals') {
+          const { data: topUsers } = await supabase
+            .from('telegram_users')
+            .select('first_name, username, referral_count')
+            .order('referral_count', { ascending: false })
+            .limit(10);
+
+          if (topUsers && topUsers.length > 0) {
+            const medals = ['🥇', '🥈', '🥉'];
+            const list = topUsers.map((user, index) => {
+              const medal = medals[index] || `${index + 1}.`;
+              const name = user.first_name || user.username || 'Unknown';
+              return `${medal} ${name} - <b>${user.referral_count || 0}</b> referrals`;
+            }).join('\n');
+
+            await sendTelegramMessage(chatId, t('topReferrals', userLang, { list }));
+          }
+        }
+
         return new Response(JSON.stringify({ ok: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
