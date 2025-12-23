@@ -7,6 +7,7 @@ import { PaymentMethodsPanel } from '@/components/PaymentMethodsPanel';
 import { DepositsPanel } from '@/components/DepositsPanel';
 import { MessagesPanel } from '@/components/MessagesPanel';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import AdminTelegramIdsPanel from '@/components/AdminTelegramIdsPanel';
 import { useTelegramUsers } from '@/hooks/useTelegramUsers';
 import { useTelegramMessages } from '@/hooks/useTelegramMessages';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -76,6 +77,7 @@ const Index = () => {
 
           {/* Right Sidebar - Bot Stats & Commands */}
           <div className="lg:col-span-1 space-y-6">
+            <AdminTelegramIdsPanel />
             <TelegramUsersPanel />
             <PaymentMethodsPanel />
             <CouponCodesPanel />
