@@ -18,9 +18,9 @@ const translations: Record<string, Record<Language, string>> = {
     hi: "🎉 <b>स्वागत है!</b>\n\n💰 आपका वर्तमान बैलेंस: <b>{balance} क्रेडिट</b>\n\n📌 <b>उपलब्ध कमांड:</b>\n/daily - डेली बोनस लें (हर 24 घंटे में 1 क्रेडिट)\n/balance - बैलेंस देखें\n/deposit - क्रेडिट जमा करें\n/referral - रेफरल लिंक पाएं\n/redeem CODE - कूपन कोड रिडीम करें\n/language - भाषा बदलें",
   },
   welcomeReferred: {
-    en: "🎉 <b>Welcome!</b>\n\n🎁 You joined via referral and got <b>+1 bonus credit!</b>\n💰 Your current balance: <b>{balance} credits</b>\n\n📌 <b>Available Commands:</b>\n/daily - Claim daily bonus (1 credit every 24 hours)\n/balance - Check your balance\n/deposit - Deposit credits\n/referral - Get your referral link\n/redeem CODE - Redeem a coupon code\n/language - Change language",
-    bn: "🎉 <b>স্বাগতম!</b>\n\n🎁 আপনি রেফারেলের মাধ্যমে যোগ দিয়েছেন এবং <b>+১ বোনাস ক্রেডিট</b> পেয়েছেন!\n💰 আপনার বর্তমান ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n\n📌 <b>উপলব্ধ কমান্ড:</b>\n/daily - ডেইলি বোনাস নিন\n/balance - ব্যালেন্স দেখুন\n/deposit - ক্রেডিট জমা দিন\n/referral - রেফারেল লিংক পান\n/redeem CODE - কুপন কোড রিডিম করুন\n/language - ভাষা পরিবর্তন করুন",
-    hi: "🎉 <b>स्वागत है!</b>\n\n🎁 आप रेफरल से जुड़े और <b>+1 बोनस क्रेडिट</b> मिला!\n💰 आपका बैलेंस: <b>{balance} क्रेडिट</b>\n\n📌 <b>उपलब्ध कमांड:</b>\n/daily - डेली बोनस लें\n/balance - बैलेंस देखें\n/deposit - क्रेडिट जमा करें\n/referral - रेफरल लिंक पाएं\n/redeem CODE - कूपन कोड रिडीम करें\n/language - भाषा बदलें",
+    en: "🎉 <b>Welcome!</b>\n\n🎁 You joined via referral and got <b>+{bonusAmount} bonus credits!</b>\n💰 Your current balance: <b>{balance} credits</b>\n\n📌 <b>Available Commands:</b>\n/daily - Claim daily bonus (1 credit every 24 hours)\n/balance - Check your balance\n/deposit - Deposit credits\n/referral - Get your referral link\n/redeem CODE - Redeem a coupon code\n/language - Change language",
+    bn: "🎉 <b>স্বাগতম!</b>\n\n🎁 আপনি রেফারেলের মাধ্যমে যোগ দিয়েছেন এবং <b>+{bonusAmount} বোনাস ক্রেডিট</b> পেয়েছেন!\n💰 আপনার বর্তমান ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n\n📌 <b>উপলব্ধ কমান্ড:</b>\n/daily - ডেইলি বোনাস নিন\n/balance - ব্যালেন্স দেখুন\n/deposit - ক্রেডিট জমা দিন\n/referral - রেফারেল লিংক পান\n/redeem CODE - কুপন কোড রিডিম করুন\n/language - ভাষা পরিবর্তন করুন",
+    hi: "🎉 <b>स्वागत है!</b>\n\n🎁 आप रेफरल से जुड़े और <b>+{bonusAmount} बोनस क्रेडिट</b> मिला!\n💰 आपका बैलेंस: <b>{balance} क्रेडिट</b>\n\n📌 <b>उपलब्ध कमांड:</b>\n/daily - डेली बोनस लें\n/balance - बैलेंस देखें\n/deposit - क्रेडिट जमा करें\n/referral - रेफरल लिंक पाएं\n/redeem CODE - कूपन कोड रिडीम करें\n/language - भाषा बदलें",
   },
   balance: {
     en: "💰 Your current balance: <b>{balance} credits</b>",
@@ -53,14 +53,14 @@ const translations: Record<string, Record<Language, string>> = {
     hi: "✅ भाषा बदल गई <b>हिन्दी</b> 🇮🇳",
   },
   referralLink: {
-    en: "🔗 <b>Your Referral Link:</b>\n\nhttps://t.me/{botUsername}?start=ref_{referralCode}\n\n👥 Total Referrals: <b>{referralCount}</b>\n💰 You get <b>+1 credit</b> for each friend who joins!",
-    bn: "🔗 <b>আপনার রেফারেল লিংক:</b>\n\nhttps://t.me/{botUsername}?start=ref_{referralCode}\n\n👥 মোট রেফারেল: <b>{referralCount}</b>\n💰 প্রতিটি বন্ধু যোগ দিলে আপনি <b>+১ ক্রেডিট</b> পাবেন!",
-    hi: "🔗 <b>आपका रेफरल लिंक:</b>\n\nhttps://t.me/{botUsername}?start=ref_{referralCode}\n\n👥 कुल रेफरल: <b>{referralCount}</b>\n💰 हर दोस्त के जुड़ने पर आपको <b>+1 क्रेडिट</b> मिलेगा!",
+    en: "🔗 <b>Your Referral Link:</b>\n\nhttps://t.me/{botUsername}?start=ref_{referralCode}\n\n👥 Total Referrals: <b>{referralCount}</b>\n💰 You get <b>+{bonusAmount} credits</b> for each friend who joins!",
+    bn: "🔗 <b>আপনার রেফারেল লিংক:</b>\n\nhttps://t.me/{botUsername}?start=ref_{referralCode}\n\n👥 মোট রেফারেল: <b>{referralCount}</b>\n💰 প্রতিটি বন্ধু যোগ দিলে আপনি <b>+{bonusAmount} ক্রেডিট</b> পাবেন!",
+    hi: "🔗 <b>आपका रेफरल लिंक:</b>\n\nhttps://t.me/{botUsername}?start=ref_{referralCode}\n\n👥 कुल रेफरल: <b>{referralCount}</b>\n💰 हर दोस्त के जुड़ने पर आपको <b>+{bonusAmount} क्रेडिट</b> मिलेगा!",
   },
   referralBonus: {
-    en: "🎉 <b>Referral Bonus!</b>\n\n👤 {userName} joined using your link!\n✅ You received <b>+1 credit</b>\n💰 New balance: <b>{balance} credits</b>\n👥 Total referrals: <b>{referralCount}</b>",
-    bn: "🎉 <b>রেফারেল বোনাস!</b>\n\n👤 {userName} আপনার লিংক দিয়ে যোগ দিয়েছে!\n✅ আপনি <b>+১ ক্রেডিট</b> পেয়েছেন\n💰 নতুন ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n👥 মোট রেফারেল: <b>{referralCount}</b>",
-    hi: "🎉 <b>रेफरल बोनस!</b>\n\n👤 {userName} आपके लिंक से जुड़ा!\n✅ आपको <b>+1 क्रेडिट</b> मिला\n💰 नया बैलेंस: <b>{balance} क्रेडिट</b>\n👥 कुल रेफरल: <b>{referralCount}</b>",
+    en: "🎉 <b>Referral Bonus!</b>\n\n👤 {userName} joined using your link!\n✅ You received <b>+{bonusAmount} credits</b>\n💰 New balance: <b>{balance} credits</b>\n👥 Total referrals: <b>{referralCount}</b>",
+    bn: "🎉 <b>রেফারেল বোনাস!</b>\n\n👤 {userName} আপনার লিংক দিয়ে যোগ দিয়েছে!\n✅ আপনি <b>+{bonusAmount} ক্রেডিট</b> পেয়েছেন\n💰 নতুন ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n👥 মোট রেফারেল: <b>{referralCount}</b>",
+    hi: "🎉 <b>रेफरल बोनस!</b>\n\n👤 {userName} आपके लिंक से जुड़ा!\n✅ आपको <b>+{bonusAmount} क्रेडिट</b> मिला\n💰 नया बैलेंस: <b>{balance} क्रेडिट</b>\n👥 कुल रेफरल: <b>{referralCount}</b>",
   },
   redeemUsage: {
     en: "📝 <b>How to redeem:</b>\n\nUse: /redeem YOUR_CODE\n\nExample: /redeem BONUS2024",
@@ -284,6 +284,15 @@ serve(async (req) => {
       }
     }
 
+    // Fetch referral bonus from settings
+    const { data: referralBonusSetting } = await supabase
+      .from('bot_settings')
+      .select('value')
+      .eq('key', 'referral_bonus')
+      .maybeSingle();
+    
+    const referralBonusAmount = referralBonusSetting ? parseInt(referralBonusSetting.value) : 3;
+
     // Upsert user into database
     const referralCode = generateReferralCode(telegramUser.id);
     const { error: userError } = await supabase
@@ -295,7 +304,7 @@ serve(async (req) => {
         username: telegramUser.username || null,
         last_active_at: new Date().toISOString(),
         referral_code: referralCode,
-        ...(isNewUser && referrerId ? { referred_by: referrerId, balance: 1 } : {}),
+        ...(isNewUser && referrerId ? { referred_by: referrerId, balance: referralBonusAmount } : {}),
       }, {
         onConflict: 'telegram_id',
       });
@@ -313,7 +322,7 @@ serve(async (req) => {
         .single();
 
       if (referrer) {
-        const newBalance = (referrer.balance || 0) + 1;
+        const newBalance = (referrer.balance || 0) + referralBonusAmount;
         const newReferralCount = (referrer.referral_count || 0) + 1;
         const referrerLang = (referrer.language || 'en') as Language;
 
@@ -331,6 +340,7 @@ serve(async (req) => {
           userName: newUserName,
           balance: newBalance,
           referralCount: newReferralCount,
+          bonusAmount: referralBonusAmount,
         }));
       }
     }
@@ -384,10 +394,20 @@ serve(async (req) => {
       if (command === 'referral') {
         const botInfo = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getMe`).then(r => r.json());
         const botUsername = botInfo.result?.username || 'your_bot';
+        
+        // Fetch referral bonus amount for display
+        const { data: refBonusSetting } = await supabase
+          .from('bot_settings')
+          .select('value')
+          .eq('key', 'referral_bonus')
+          .maybeSingle();
+        const displayBonusAmount = refBonusSetting ? parseInt(refBonusSetting.value) : 3;
+        
         await sendTelegramMessage(chatId, t('referralLink', userLang, {
           botUsername,
           referralCode: currentUser?.referral_code || generateReferralCode(telegramUser.id),
           referralCount: currentUser?.referral_count || 0,
+          bonusAmount: displayBonusAmount,
         }));
         return new Response(JSON.stringify({ ok: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },

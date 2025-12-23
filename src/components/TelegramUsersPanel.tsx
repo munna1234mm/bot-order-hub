@@ -1,18 +1,30 @@
 import { useState } from 'react';
 import { useTelegramUsers } from '@/hooks/useTelegramUsers';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Bot, Circle, Coins, Ban, CheckCircle } from 'lucide-react';
+import { Bot, Circle, Coins, Ban, CheckCircle, Plus, Minus, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 export function TelegramUsersPanel() {
   const { users, activeUsers, loading } = useTelegramUsers();
   const { t } = useLanguage();
   const [banningUserId, setBanningUserId] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<typeof users[0] | null>(null);
+  const [creditAmount, setCreditAmount] = useState<string>('');
+  const [updatingCredits, setUpdatingCredits] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const getDisplayName = (user: typeof users[0]) => {
     if (user.first_name && user.last_name) {
@@ -53,6 +65,49 @@ export function TelegramUsersPanel() {
     } finally {
       setBanningUserId(null);
     }
+  };
+
+  const handleAdjustCredits = async (type: 'add' | 'subtract') => {
+    if (!selectedUser) return;
+    
+    const amount = parseInt(creditAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+
+    setUpdatingCredits(true);
+    try {
+      const newBalance = type === 'add' 
+        ? selectedUser.balance + amount 
+        : Math.max(0, selectedUser.balance - amount);
+
+      const { error } = await supabase
+        .from('telegram_users')
+        .update({ balance: newBalance })
+        .eq('id', selectedUser.id);
+
+      if (error) throw error;
+
+      toast.success(
+        type === 'add' 
+          ? `Added ${amount} credits to ${getDisplayName(selectedUser)}` 
+          : `Removed ${amount} credits from ${getDisplayName(selectedUser)}`
+      );
+      setCreditAmount('');
+      setDialogOpen(false);
+    } catch (error) {
+      console.error('Error adjusting credits:', error);
+      toast.error('Failed to adjust credits');
+    } finally {
+      setUpdatingCredits(false);
+    }
+  };
+
+  const openCreditDialog = (user: typeof users[0]) => {
+    setSelectedUser(user);
+    setCreditAmount('');
+    setDialogOpen(true);
   };
 
   return (
@@ -127,22 +182,63 @@ export function TelegramUsersPanel() {
                     {user.username ? `@${user.username}` : `ID: ${user.telegram_id}`}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="text-right">
-                    <div className="flex items-center gap-1 text-sm font-medium text-foreground">
-                      <Coins className="h-3 w-3 text-primary" />
-                      {user.balance || 0}
-                    </div>
-                    {isActive(user.last_active_at) ? (
-                      <span className="text-[10px] text-status-delivered font-medium uppercase tracking-wider">
-                        {t('active')}
-                      </span>
-                    ) : (
-                      <span className="text-[10px] text-muted-foreground">
-                        {formatDistanceToNow(new Date(user.last_active_at), { addSuffix: true })}
-                      </span>
-                    )}
-                  </div>
+                <div className="flex items-center gap-1">
+                  <Dialog open={dialogOpen && selectedUser?.id === user.id} onOpenChange={(open) => {
+                    if (!open) setDialogOpen(false);
+                  }}>
+                    <DialogTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8 px-2"
+                        onClick={() => openCreditDialog(user)}
+                        title="Adjust credits"
+                      >
+                        <Coins className="h-3 w-3 mr-1 text-primary" />
+                        {user.balance || 0}
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[350px]">
+                      <DialogHeader>
+                        <DialogTitle>Adjust Credits - {getDisplayName(user)}</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-primary">{user.balance || 0}</p>
+                          <p className="text-sm text-muted-foreground">Current Balance</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Input
+                            type="number"
+                            min="1"
+                            placeholder="Amount"
+                            value={creditAmount}
+                            onChange={(e) => setCreditAmount(e.target.value)}
+                            className="flex-1"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            className="flex-1"
+                            variant="outline"
+                            onClick={() => handleAdjustCredits('subtract')}
+                            disabled={updatingCredits}
+                          >
+                            <Minus className="h-4 w-4 mr-1" />
+                            Remove
+                          </Button>
+                          <Button
+                            className="flex-1"
+                            onClick={() => handleAdjustCredits('add')}
+                            disabled={updatingCredits}
+                          >
+                            <Plus className="h-4 w-4 mr-1" />
+                            Add
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                   <Button
                     size="sm"
                     variant={user.is_banned ? "outline" : "destructive"}
