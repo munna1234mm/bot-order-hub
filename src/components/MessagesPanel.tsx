@@ -1,5 +1,6 @@
 import { useTelegramMessages } from '@/hooks/useTelegramMessages';
 import { useTelegramUsers } from '@/hooks/useTelegramUsers';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { MessageSquare } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -7,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 export function MessagesPanel() {
   const { messages, loading } = useTelegramMessages();
   const { users } = useTelegramUsers();
+  const { t } = useLanguage();
 
   const getUserName = (telegramUserId: number) => {
     const user = users.find(u => u.telegram_id === telegramUserId);
@@ -29,9 +31,9 @@ export function MessagesPanel() {
           <MessageSquare className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="font-semibold text-foreground">Recent Messages</h3>
+          <h3 className="font-semibold text-foreground">{t('messages')}</h3>
           <p className="text-xs text-muted-foreground">
-            {messages.length} messages
+            {messages.length} {t('messages').toLowerCase()}
           </p>
         </div>
       </div>
@@ -40,11 +42,11 @@ export function MessagesPanel() {
         <div className="space-y-3 pr-4">
           {loading ? (
             <p className="text-sm text-muted-foreground text-center py-4">
-              Loading...
+              {t('loading')}
             </p>
           ) : messages.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
-              No messages yet
+              {t('noMessages')}
             </p>
           ) : (
             messages.map((message, index) => (
