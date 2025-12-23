@@ -4,8 +4,9 @@ import { StatsCard } from '@/components/StatsCard';
 import { OrdersTable } from '@/components/OrdersTable';
 import { OrderDetails } from '@/components/OrderDetails';
 import { StatusFilter } from '@/components/StatusFilter';
+import { OnlineUsersPanel } from '@/components/OnlineUsersPanel';
 import { mockOrders, getOrderStats, Order, OrderStatus } from '@/lib/mockData';
-import { Package, Clock, CheckCircle, DollarSign, TrendingUp } from 'lucide-react';
+import { Package, Clock, CheckCircle, DollarSign } from 'lucide-react';
 
 const Index = () => {
   const [orders, setOrders] = useState(mockOrders);
@@ -56,53 +57,61 @@ const Index = () => {
           </p>
         </div>
 
-        {/* Stats Grid */}
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <StatsCard
-            title="Total Orders"
-            value={stats.totalOrders}
-            icon={Package}
-            trend={{ value: 12, isPositive: true }}
-          />
-          <StatsCard
-            title="Pending"
-            value={stats.pendingOrders}
-            icon={Clock}
-          />
-          <StatsCard
-            title="Completed"
-            value={stats.completedOrders}
-            icon={CheckCircle}
-          />
-          <StatsCard
-            title="Revenue"
-            value={`$${stats.totalRevenue.toFixed(2)}`}
-            icon={DollarSign}
-            variant="primary"
-            trend={{ value: 8, isPositive: true }}
-          />
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Main Content Area */}
+          <div className="lg:col-span-3 space-y-6">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+              <StatsCard
+                title="Total Orders"
+                value={stats.totalOrders}
+                icon={Package}
+                trend={{ value: 12, isPositive: true }}
+              />
+              <StatsCard
+                title="Pending"
+                value={stats.pendingOrders}
+                icon={Clock}
+              />
+              <StatsCard
+                title="Completed"
+                value={stats.completedOrders}
+                icon={CheckCircle}
+              />
+              <StatsCard
+                title="Revenue"
+                value={`$${stats.totalRevenue.toFixed(2)}`}
+                icon={DollarSign}
+                variant="primary"
+                trend={{ value: 8, isPositive: true }}
+              />
+            </div>
 
-        {/* Orders Section */}
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-foreground">Recent Orders</h2>
-        </div>
+            {/* Orders Section */}
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-foreground">Recent Orders</h2>
+            </div>
 
-        {/* Status Filter */}
-        <div className="mb-6">
-          <StatusFilter
-            activeStatus={activeStatus}
-            onStatusChange={setActiveStatus}
-            counts={statusCounts}
-          />
-        </div>
+            {/* Status Filter */}
+            <StatusFilter
+              activeStatus={activeStatus}
+              onStatusChange={setActiveStatus}
+              counts={statusCounts}
+            />
 
-        {/* Orders Table */}
-        <OrdersTable
-          orders={filteredOrders}
-          onSelectOrder={setSelectedOrder}
-          selectedOrderId={selectedOrder?.id}
-        />
+            {/* Orders Table */}
+            <OrdersTable
+              orders={filteredOrders}
+              onSelectOrder={setSelectedOrder}
+              selectedOrderId={selectedOrder?.id}
+            />
+          </div>
+
+          {/* Right Sidebar - Live Users */}
+          <div className="lg:col-span-1">
+            <OnlineUsersPanel />
+          </div>
+        </div>
       </main>
 
       {/* Order Details Sidebar */}

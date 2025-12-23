@@ -5,9 +5,12 @@ import {
   Users, 
   Settings, 
   MessageCircle,
-  Send
+  Send,
+  LogOut
 } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -17,6 +20,15 @@ const navigation = [
 ];
 
 export function Sidebar() {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success('Signed out successfully');
+    navigate('/auth');
+  };
+
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-sidebar">
       <div className="flex h-full flex-col">
@@ -52,8 +64,31 @@ export function Sidebar() {
           ))}
         </nav>
 
-        {/* Bot Status */}
-        <div className="border-t border-border p-4">
+        {/* User Info & Bot Status */}
+        <div className="border-t border-border p-4 space-y-3">
+          {/* Current User */}
+          {user && (
+            <div className="flex items-center gap-3 rounded-lg bg-accent/50 px-3 py-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-primary font-semibold text-sm">
+                {(user.user_metadata?.name || user.email || 'U').charAt(0).toUpperCase()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground truncate">
+                  {user.user_metadata?.name || user.email?.split('@')[0]}
+                </p>
+                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+              </div>
+              <button
+                onClick={handleSignOut}
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                title="Sign out"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+
+          {/* Bot Status */}
           <div className="flex items-center gap-3 rounded-lg bg-accent/50 px-3 py-2.5">
             <div className="relative">
               <MessageCircle className="h-5 w-5 text-primary" />
