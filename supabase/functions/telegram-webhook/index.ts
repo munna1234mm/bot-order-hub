@@ -8,6 +8,55 @@ const corsHeaders = {
 
 const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN');
 
+// Multi-language translations
+type Language = 'en' | 'bn' | 'hi';
+
+const translations: Record<string, Record<Language, string>> = {
+  welcome: {
+    en: "🎉 <b>Welcome!</b>\n\n💰 Your current balance: <b>{balance} credits</b>\n\n📌 <b>Available Commands:</b>\n/daily - Claim daily bonus (1 credit every 24 hours)\n/balance - Check your balance\n/language - Change language",
+    bn: "🎉 <b>স্বাগতম!</b>\n\n💰 আপনার বর্তমান ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n\n📌 <b>উপলব্ধ কমান্ড:</b>\n/daily - ডেইলি বোনাস নিন (প্রতি ২৪ ঘন্টায় ১ ক্রেডিট)\n/balance - ব্যালেন্স দেখুন\n/language - ভাষা পরিবর্তন করুন",
+    hi: "🎉 <b>स्वागत है!</b>\n\n💰 आपका वर्तमान बैलेंस: <b>{balance} क्रेडिट</b>\n\n📌 <b>उपलब्ध कमांड:</b>\n/daily - डेली बोनस लें (हर 24 घंटे में 1 क्रेडिट)\n/balance - बैलेंस देखें\n/language - भाषा बदलें",
+  },
+  balance: {
+    en: "💰 Your current balance: <b>{balance} credits</b>",
+    bn: "💰 আপনার বর্তমান ব্যালেন্স: <b>{balance} ক্রেডিট</b>",
+    hi: "💰 आपका वर्तमान बैलेंस: <b>{balance} क्रेडिट</b>",
+  },
+  dailyAlreadyClaimed: {
+    en: "⏰ You have already claimed today's bonus!\n\n⏳ Wait for next bonus: <b>{hours} hours {minutes} minutes</b>",
+    bn: "⏰ আপনি ইতিমধ্যে আজকের বোনাস নিয়েছেন!\n\n⏳ পরবর্তী বোনাস পেতে অপেক্ষা করুন: <b>{hours} ঘন্টা {minutes} মিনিট</b>",
+    hi: "⏰ आपने आज का बोनस पहले ही ले लिया है!\n\n⏳ अगले बोनस के लिए प्रतीक्षा करें: <b>{hours} घंटे {minutes} मिनट</b>",
+  },
+  dailySuccess: {
+    en: "🎁 <b>Daily Bonus!</b>\n\n✅ You received +1 credit!\n💰 New balance: <b>{balance} credits</b>\n\n⏰ Next bonus in 24 hours",
+    bn: "🎁 <b>ডেইলি বোনাস!</b>\n\n✅ আপনি +১ ক্রেডিট পেয়েছেন!\n💰 নতুন ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n\n⏰ পরবর্তী বোনাস ২৪ ঘন্টা পর",
+    hi: "🎁 <b>डेली बोनस!</b>\n\n✅ आपको +1 क्रेडिट मिला!\n💰 नया बैलेंस: <b>{balance} क्रेडिट</b>\n\n⏰ अगला बोनस 24 घंटे बाद",
+  },
+  dailyError: {
+    en: "❌ Error giving bonus. Please try again later.",
+    bn: "❌ বোনাস প্রদানে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন।",
+    hi: "❌ बोनस देने में त्रुटि। कृपया बाद में पुनः प्रयास करें।",
+  },
+  languageSelect: {
+    en: "🌐 <b>Select Language / ভাষা নির্বাচন করুন / भाषा चुनें</b>\n\n/lang_en - English 🇬🇧\n/lang_bn - বাংলা 🇧🇩\n/lang_hi - हिन्दी 🇮🇳",
+    bn: "🌐 <b>Select Language / ভাষা নির্বাচন করুন / भाषा चुनें</b>\n\n/lang_en - English 🇬🇧\n/lang_bn - বাংলা 🇧🇩\n/lang_hi - हिन्दी 🇮🇳",
+    hi: "🌐 <b>Select Language / ভাষা নির্বাচন করুন / भाषा चुनें</b>\n\n/lang_en - English 🇬🇧\n/lang_bn - বাংলা 🇧🇩\n/lang_hi - हिन्दी 🇮🇳",
+  },
+  languageChanged: {
+    en: "✅ Language changed to <b>English</b> 🇬🇧",
+    bn: "✅ ভাষা পরিবর্তন হয়েছে <b>বাংলা</b> 🇧🇩",
+    hi: "✅ भाषा बदल गई <b>हिन्दी</b> 🇮🇳",
+  },
+};
+
+function t(key: string, lang: Language, replacements: Record<string, string | number> = {}): string {
+  let text = translations[key]?.[lang] || translations[key]?.['en'] || key;
+  for (const [k, v] of Object.entries(replacements)) {
+    text = text.replace(`{${k}}`, String(v));
+  }
+  return text;
+}
+
 async function sendTelegramMessage(chatId: number, text: string) {
   const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
   const response = await fetch(url, {
@@ -52,7 +101,7 @@ serve(async (req) => {
     console.log('Message:', messageText);
 
     // Upsert user into database
-    const { data: userData, error: userError } = await supabase
+    const { error: userError } = await supabase
       .from('telegram_users')
       .upsert({
         telegram_id: telegramUser.id,
@@ -62,20 +111,20 @@ serve(async (req) => {
         last_active_at: new Date().toISOString(),
       }, {
         onConflict: 'telegram_id',
-      })
-      .select()
-      .single();
+      });
 
     if (userError) {
       console.error('User upsert error:', userError);
     }
 
-    // Get user's current balance
+    // Get user's current data including language
     const { data: currentUser } = await supabase
       .from('telegram_users')
-      .select('balance, last_daily_claim')
+      .select('balance, last_daily_claim, language')
       .eq('telegram_id', telegramUser.id)
       .single();
+
+    const userLang = (currentUser?.language || 'en') as Language;
 
     // Save message to database
     const { error: msgError } = await supabase
@@ -98,8 +147,7 @@ serve(async (req) => {
       // Handle /start command - show balance
       if (command === 'start') {
         const balance = currentUser?.balance || 0;
-        const welcomeMessage = `🎉 <b>স্বাগতম!</b>\n\n💰 আপনার বর্তমান ব্যালেন্স: <b>${balance} ক্রেডিট</b>\n\n📌 <b>উপলব্ধ কমান্ড:</b>\n/daily - ডেইলি বোনাস নিন (প্রতি ২৪ ঘন্টায় ১ ক্রেডিট)\n/balance - ব্যালেন্স দেখুন`;
-        await sendTelegramMessage(chatId, welcomeMessage);
+        await sendTelegramMessage(chatId, t('welcome', userLang, { balance }));
         return new Response(JSON.stringify({ ok: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -108,7 +156,29 @@ serve(async (req) => {
       // Handle /balance command
       if (command === 'balance') {
         const balance = currentUser?.balance || 0;
-        await sendTelegramMessage(chatId, `💰 আপনার বর্তমান ব্যালেন্স: <b>${balance} ক্রেডিট</b>`);
+        await sendTelegramMessage(chatId, t('balance', userLang, { balance }));
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Handle /language command
+      if (command === 'language') {
+        await sendTelegramMessage(chatId, t('languageSelect', userLang));
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Handle language change commands
+      if (command === 'lang_en' || command === 'lang_bn' || command === 'lang_hi') {
+        const newLang = command.replace('lang_', '') as Language;
+        await supabase
+          .from('telegram_users')
+          .update({ language: newLang })
+          .eq('telegram_id', telegramUser.id);
+        
+        await sendTelegramMessage(chatId, t('languageChanged', newLang));
         return new Response(JSON.stringify({ ok: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -124,9 +194,12 @@ serve(async (req) => {
           const hoursSinceLastClaim = (now.getTime() - lastClaimDate.getTime()) / (1000 * 60 * 60);
           
           if (hoursSinceLastClaim < 24) {
-            const hoursRemaining = Math.ceil(24 - hoursSinceLastClaim);
-            const minutesRemaining = Math.ceil((24 - hoursSinceLastClaim) * 60) % 60;
-            await sendTelegramMessage(chatId, `⏰ আপনি ইতিমধ্যে আজকের বোনাস নিয়েছেন!\n\n⏳ পরবর্তী বোনাস পেতে অপেক্ষা করুন: <b>${hoursRemaining} ঘন্টা ${minutesRemaining} মিনিট</b>`);
+            const hoursRemaining = Math.floor(24 - hoursSinceLastClaim);
+            const minutesRemaining = Math.ceil((24 - hoursSinceLastClaim - hoursRemaining) * 60);
+            await sendTelegramMessage(chatId, t('dailyAlreadyClaimed', userLang, { 
+              hours: hoursRemaining, 
+              minutes: minutesRemaining 
+            }));
             return new Response(JSON.stringify({ ok: true }), {
               headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             });
@@ -145,9 +218,9 @@ serve(async (req) => {
 
         if (updateError) {
           console.error('Balance update error:', updateError);
-          await sendTelegramMessage(chatId, '❌ বোনাস প্রদানে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন।');
+          await sendTelegramMessage(chatId, t('dailyError', userLang));
         } else {
-          await sendTelegramMessage(chatId, `🎁 <b>ডেইলি বোনাস!</b>\n\n✅ আপনি +1 ক্রেডিট পেয়েছেন!\n💰 নতুন ব্যালেন্স: <b>${newBalance} ক্রেডিট</b>\n\n⏰ পরবর্তী বোনাস ২৪ ঘন্টা পর`);
+          await sendTelegramMessage(chatId, t('dailySuccess', userLang, { balance: newBalance }));
         }
         return new Response(JSON.stringify({ ok: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },

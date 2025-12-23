@@ -101,6 +101,7 @@ export type Database = {
           created_at: string
           first_name: string | null
           id: string
+          language: string
           last_active_at: string
           last_daily_claim: string | null
           last_name: string | null
@@ -112,6 +113,7 @@ export type Database = {
           created_at?: string
           first_name?: string | null
           id?: string
+          language?: string
           last_active_at?: string
           last_daily_claim?: string | null
           last_name?: string | null
@@ -123,6 +125,7 @@ export type Database = {
           created_at?: string
           first_name?: string | null
           id?: string
+          language?: string
           last_active_at?: string
           last_daily_claim?: string | null
           last_name?: string | null
