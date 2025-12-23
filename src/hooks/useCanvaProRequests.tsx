@@ -123,9 +123,9 @@ export const useCanvaProRequests = () => {
         const lang = userInfo?.language || 'en';
         
         const messages: Record<string, string> = {
-          en: "🎉 <b>Canva Pro Approved!</b>\n\n✅ Check your Gmail! You have been given Canva Pro access.\n💰 5 credits have been deducted from your balance.",
-          bn: "🎉 <b>Canva Pro অনুমোদিত!</b>\n\n✅ আপনার জিমেইল চেক করুন! আপনাকে Canva Pro দেওয়া হয়েছে।\n💰 আপনার ব্যালেন্স থেকে ৫ ক্রেডিট কেটে নেওয়া হয়েছে।",
-          hi: "🎉 <b>Canva Pro स्वीकृत!</b>\n\n✅ अपना Gmail चेक करें! आपको Canva Pro एक्सेस दिया गया है।\n💰 आपके बैलेंस से 5 क्रेडिट काटे गए हैं।"
+          en: "🎉 <b>Canva Pro (12 Month) Approved!</b>\n\n✅ Your account has been sent! Please check your Gmail inbox.\n📅 Validity: <b>12 Months</b>\n💰 5 credits have been deducted from your balance.",
+          bn: "🎉 <b>Canva Pro (১২ মাস) অনুমোদিত!</b>\n\n✅ আপনার অ্যাকাউন্ট পাঠানো হয়েছে! অনুগ্রহ করে আপনার জিমেইলের ইনবক্স চেক করুন।\n📅 মেয়াদ: <b>১২ মাস</b>\n💰 আপনার ব্যালেন্স থেকে ৫ ক্রেডিট কেটে নেওয়া হয়েছে।",
+          hi: "🎉 <b>Canva Pro (12 महीने) स्वीकृत!</b>\n\n✅ आपका अकाउंट भेज दिया गया है! कृपया अपना Gmail इनबॉक्स चेक करें।\n📅 वैधता: <b>12 महीने</b>\n💰 आपके बैलेंस से 5 क्रेडिट काटे गए हैं।"
         };
 
         try {
