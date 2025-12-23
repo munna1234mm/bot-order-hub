@@ -8,6 +8,7 @@ import { DepositsPanel } from '@/components/DepositsPanel';
 import { MessagesPanel } from '@/components/MessagesPanel';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import AdminTelegramIdsPanel from '@/components/AdminTelegramIdsPanel';
+import { CanvaProRequestsPanel } from '@/components/CanvaProRequestsPanel';
 import { useTelegramUsers } from '@/hooks/useTelegramUsers';
 import { useTelegramMessages } from '@/hooks/useTelegramMessages';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -67,6 +68,11 @@ const Index = () => {
         {/* Deposits Panel */}
         <div className="mb-6">
           <DepositsPanel />
+        </div>
+
+        {/* Canva Pro Requests Panel */}
+        <div className="mb-6">
+          <CanvaProRequestsPanel />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

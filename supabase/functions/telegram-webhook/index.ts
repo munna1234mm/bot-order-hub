@@ -167,6 +167,41 @@ const translations: Record<string, Record<Language, string>> = {
     bn: "❌ এই টেলিগ্রাম আইডি দিয়ে কোনো ইউজার পাওয়া যায়নি।",
     hi: "❌ इस टेलीग्राम ID से कोई यूजर नहीं मिला।",
   },
+  canvaProAskGmail: {
+    en: "📧 <b>Canva Pro Request</b>\n\n💰 Cost: <b>5 credits</b>\n\nPlease send your Gmail address (without password) to get Canva Pro access.\n\nExample: yourname@gmail.com",
+    bn: "📧 <b>Canva Pro রিকোয়েস্ট</b>\n\n💰 খরচ: <b>৫ ক্রেডিট</b>\n\nCanva Pro অ্যাক্সেস পেতে আপনার জিমেইল অ্যাড্রেস পাঠান (পাসওয়ার্ড ছাড়া)।\n\nউদাহরণ: yourname@gmail.com",
+    hi: "📧 <b>Canva Pro रिक्वेस्ट</b>\n\n💰 लागत: <b>5 क्रेडिट</b>\n\nCanva Pro एक्सेस पाने के लिए अपना Gmail पता भेजें (पासवर्ड के बिना)।\n\nउदाहरण: yourname@gmail.com",
+  },
+  canvaProInsufficientBalance: {
+    en: "❌ <b>Insufficient Balance!</b>\n\n💰 Your balance: <b>{balance} credits</b>\n📌 Required: <b>5 credits</b>\n\nPlease deposit more credits first using /deposit",
+    bn: "❌ <b>পর্যাপ্ত ব্যালেন্স নেই!</b>\n\n💰 আপনার ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n📌 প্রয়োজন: <b>৫ ক্রেডিট</b>\n\n/deposit ব্যবহার করে আরো ক্রেডিট জমা দিন",
+    hi: "❌ <b>अपर्याप्त बैलेंस!</b>\n\n💰 आपका बैलेंस: <b>{balance} क्रेडिट</b>\n📌 आवश्यक: <b>5 क्रेडिट</b>\n\nकृपया /deposit का उपयोग करके पहले अधिक क्रेडिट जमा करें",
+  },
+  canvaProRequestPending: {
+    en: "⏳ <b>You already have a pending Canva Pro request!</b>\n\nPlease wait for admin approval.",
+    bn: "⏳ <b>আপনার ইতিমধ্যে একটি Canva Pro রিকোয়েস্ট পেন্ডিং আছে!</b>\n\nঅনুগ্রহ করে অ্যাডমিনের অনুমোদনের জন্য অপেক্ষা করুন।",
+    hi: "⏳ <b>आपकी पहले से एक Canva Pro रिक्वेस्ट पेंडिंग है!</b>\n\nकृपया एडमिन की मंजूरी का इंतजार करें।",
+  },
+  canvaProRequestSubmitted: {
+    en: "✅ <b>Canva Pro Request Submitted!</b>\n\n📧 Gmail: <b>{gmail}</b>\n\n⏳ Please wait for admin approval. You will receive a message once your request is processed.",
+    bn: "✅ <b>Canva Pro রিকোয়েস্ট জমা হয়েছে!</b>\n\n📧 জিমেইল: <b>{gmail}</b>\n\n⏳ অ্যাডমিনের অনুমোদনের জন্য অপেক্ষা করুন। আপনার রিকোয়েস্ট প্রসেস হলে আপনি একটি মেসেজ পাবেন।",
+    hi: "✅ <b>Canva Pro रिक्वेस्ट जमा हुई!</b>\n\n📧 Gmail: <b>{gmail}</b>\n\n⏳ कृपया एडमिन की मंजूरी का इंतजार करें। आपकी रिक्वेस्ट प्रोसेस होने पर आपको मैसेज मिलेगा।",
+  },
+  canvaProInvalidGmail: {
+    en: "❌ Invalid Gmail address. Please send a valid Gmail address.\n\nExample: yourname@gmail.com",
+    bn: "❌ ভুল জিমেইল অ্যাড্রেস। অনুগ্রহ করে সঠিক জিমেইল অ্যাড্রেস পাঠান।\n\nউদাহরণ: yourname@gmail.com",
+    hi: "❌ गलत Gmail पता। कृपया सही Gmail पता भेजें।\n\nउदाहरण: yourname@gmail.com",
+  },
+  canvaProApproved: {
+    en: "🎉 <b>Canva Pro Approved!</b>\n\n✅ Check your Gmail! You have been given Canva Pro access.\n💰 5 credits have been deducted from your balance.",
+    bn: "🎉 <b>Canva Pro অনুমোদিত!</b>\n\n✅ আপনার জিমেইল চেক করুন! আপনাকে Canva Pro দেওয়া হয়েছে।\n💰 আপনার ব্যালেন্স থেকে ৫ ক্রেডিট কেটে নেওয়া হয়েছে।",
+    hi: "🎉 <b>Canva Pro स्वीकृत!</b>\n\n✅ अपना Gmail चेक करें! आपको Canva Pro एक्सेस दिया गया है।\n💰 आपके बैलेंस से 5 क्रेडिट काटे गए हैं।",
+  },
+  canvaProAdminNotification: {
+    en: "🔔 <b>New Canva Pro Request!</b>\n\n👤 User: {userName} (@{username})\n🆔 Telegram ID: {telegramId}\n📧 Gmail: {gmail}\n\n⏳ Awaiting approval",
+    bn: "🔔 <b>নতুন Canva Pro রিকোয়েস্ট!</b>\n\n👤 ইউজার: {userName} (@{username})\n🆔 টেলিগ্রাম ID: {telegramId}\n📧 জিমেইল: {gmail}\n\n⏳ অনুমোদনের অপেক্ষায়",
+    hi: "🔔 <b>नई Canva Pro रिक्वेस्ट!</b>\n\n👤 यूजर: {userName} (@{username})\n🆔 टेलीग्राम ID: {telegramId}\n📧 Gmail: {gmail}\n\n⏳ अप्रूवल पेंडिंग",
+  },
 };
 
 function t(key: string, lang: Language, replacements: Record<string, string | number> = {}): string {
@@ -728,6 +763,41 @@ serve(async (req) => {
         });
       }
 
+      // Handle /canva_pro command
+      if (command === 'canva_pro') {
+        const userBalance = currentUser?.balance || 0;
+
+        // Check if user has enough balance
+        if (userBalance < 5) {
+          await sendTelegramMessage(chatId, t('canvaProInsufficientBalance', userLang, { balance: userBalance }));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Check if user already has a pending request
+        const { data: pendingRequest } = await supabase
+          .from('canva_pro_requests')
+          .select('id')
+          .eq('telegram_user_id', telegramUser.id)
+          .eq('status', 'pending')
+          .maybeSingle();
+
+        if (pendingRequest) {
+          await sendTelegramMessage(chatId, t('canvaProRequestPending', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Ask for Gmail
+        await sendTelegramMessage(chatId, t('canvaProAskGmail', userLang));
+
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
       // Handle /daily command - give 1 credit every 24 hours
       if (command === 'daily') {
         const lastClaim = currentUser?.last_daily_claim;
@@ -782,6 +852,75 @@ serve(async (req) => {
       if (commandData?.response) {
         console.log('Sending auto-reply for command:', command);
         await sendTelegramMessage(chatId, commandData.response);
+      }
+    } else {
+      // Handle non-command messages - check if it's a Gmail for Canva Pro
+      const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
+      
+      if (gmailRegex.test(messageText.trim())) {
+        const gmail = messageText.trim().toLowerCase();
+        const userBalance = currentUser?.balance || 0;
+
+        // Check if user has enough balance
+        if (userBalance < 5) {
+          await sendTelegramMessage(chatId, t('canvaProInsufficientBalance', userLang, { balance: userBalance }));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Check if user already has a pending request
+        const { data: pendingRequest } = await supabase
+          .from('canva_pro_requests')
+          .select('id')
+          .eq('telegram_user_id', telegramUser.id)
+          .eq('status', 'pending')
+          .maybeSingle();
+
+        if (pendingRequest) {
+          await sendTelegramMessage(chatId, t('canvaProRequestPending', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Create Canva Pro request
+        const { error: requestError } = await supabase
+          .from('canva_pro_requests')
+          .insert({
+            telegram_user_id: telegramUser.id,
+            gmail: gmail,
+            status: 'pending'
+          });
+
+        if (requestError) {
+          console.error('Canva Pro request error:', requestError);
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Notify admins
+        const { data: adminIds } = await supabase
+          .from('admin_telegram_ids')
+          .select('telegram_chat_id')
+          .eq('is_active', true);
+
+        if (adminIds && adminIds.length > 0) {
+          const userName = telegramUser.first_name || 'Unknown';
+          const username = telegramUser.username || 'no_username';
+          
+          for (const admin of adminIds) {
+            await sendTelegramMessage(admin.telegram_chat_id, t('canvaProAdminNotification', 'en', {
+              userName,
+              username,
+              telegramId: telegramUser.id,
+              gmail,
+            }));
+          }
+        }
+
+        await sendTelegramMessage(chatId, t('canvaProRequestSubmitted', userLang, { gmail }));
       }
     }
 
