@@ -11,6 +11,8 @@ interface TelegramUser {
   created_at: string;
   balance: number;
   last_daily_claim: string | null;
+  is_banned: boolean;
+  banned_at: string | null;
 }
 
 export function useTelegramUsers() {

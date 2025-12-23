@@ -122,11 +122,6 @@ const translations: Record<string, Record<Language, string>> = {
     bn: "❌ ডিপোজিট রিকোয়েস্ট জমা দিতে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন।",
     hi: "❌ डिपॉजिट रिक्वेस्ट जमा करने में त्रुटि। कृपया बाद में पुनः प्रयास करें।",
   },
-  topUsage: {
-    en: "📊 <b>Leaderboard</b>\n\nUse:\n/top balance - Top users by credits\n/top referrals - Top users by referrals",
-    bn: "📊 <b>লিডারবোর্ড</b>\n\nব্যবহার:\n/top balance - ক্রেডিট অনুযায়ী টপ ইউজার\n/top referrals - রেফারেল অনুযায়ী টপ ইউজার",
-    hi: "📊 <b>लीडरबोर्ड</b>\n\nउपयोग:\n/top balance - क्रेडिट के अनुसार टॉप यूजर\n/top referrals - रेफरल के अनुसार टॉप यूजर",
-  },
   topBalance: {
     en: "🏆 <b>Top Users by Credits</b>\n\n{list}",
     bn: "🏆 <b>ক্রেডিট অনুযায়ী টপ ইউজার</b>\n\n{list}",
@@ -141,6 +136,36 @@ const translations: Record<string, Record<Language, string>> = {
     en: "🔔 <b>New Deposit Request!</b>\n\n👤 User: {userName} (@{username})\n🆔 Telegram ID: {telegramId}\n💳 Method: {method}\n💰 Amount: ৳{amount}\n🔢 TXN ID: {txnId}\n\n⏳ Awaiting approval",
     bn: "🔔 <b>নতুন ডিপোজিট রিকোয়েস্ট!</b>\n\n👤 ইউজার: {userName} (@{username})\n🆔 টেলিগ্রাম ID: {telegramId}\n💳 মেথড: {method}\n💰 পরিমাণ: ৳{amount}\n🔢 TXN ID: {txnId}\n\n⏳ অ্যাপ্রুভাল পেন্ডিং",
     hi: "🔔 <b>नई डिपॉजिट रिक्वेस्ट!</b>\n\n👤 यूजर: {userName} (@{username})\n🆔 टेलीग्राम ID: {telegramId}\n💳 मेथड: {method}\n💰 राशि: ৳{amount}\n🔢 TXN ID: {txnId}\n\n⏳ अप्रूवल पेंडिंग",
+  },
+  userBanned: {
+    en: "🚫 <b>You have been banned from using this bot.</b>",
+    bn: "🚫 <b>আপনাকে এই বট ব্যবহার থেকে নিষিদ্ধ করা হয়েছে।</b>",
+    hi: "🚫 <b>आपको इस बॉट से प्रतिबंधित कर दिया गया है।</b>",
+  },
+  banUsage: {
+    en: "📝 <b>Ban/Unban Usage:</b>\n\n/ban TELEGRAM_ID - Ban a user\n/unban TELEGRAM_ID - Unban a user\n\nExample: /ban 123456789",
+    bn: "📝 <b>ব্যান/আনব্যান নিয়ম:</b>\n\n/ban টেলিগ্রাম_আইডি - ইউজারকে ব্যান করুন\n/unban টেলিগ্রাম_আইডি - ইউজারকে আনব্যান করুন\n\nউদাহরণ: /ban 123456789",
+    hi: "📝 <b>बैन/अनबैन नियम:</b>\n\n/ban TELEGRAM_ID - यूजर को बैन करें\n/unban TELEGRAM_ID - यूजर को अनबैन करें\n\nउदाहरण: /ban 123456789",
+  },
+  banNotAdmin: {
+    en: "❌ You are not authorized to use this command.",
+    bn: "❌ আপনি এই কমান্ড ব্যবহার করতে অনুমোদিত নন।",
+    hi: "❌ आप इस कमांड का उपयोग करने के लिए अधिकृत नहीं हैं।",
+  },
+  banSuccess: {
+    en: "✅ <b>User Banned!</b>\n\n🆔 Telegram ID: {telegramId}\n👤 Name: {userName}",
+    bn: "✅ <b>ইউজার ব্যান হয়েছে!</b>\n\n🆔 টেলিগ্রাম ID: {telegramId}\n👤 নাম: {userName}",
+    hi: "✅ <b>यूजर बैन हुआ!</b>\n\n🆔 टेलीग्राम ID: {telegramId}\n👤 नाम: {userName}",
+  },
+  unbanSuccess: {
+    en: "✅ <b>User Unbanned!</b>\n\n🆔 Telegram ID: {telegramId}\n👤 Name: {userName}",
+    bn: "✅ <b>ইউজার আনব্যান হয়েছে!</b>\n\n🆔 টেলিগ্রাম ID: {telegramId}\n👤 নাম: {userName}",
+    hi: "✅ <b>यूजर अनबैन हुआ!</b>\n\n🆔 टेलीग्राम ID: {telegramId}\n👤 नाम: {userName}",
+  },
+  banUserNotFound: {
+    en: "❌ User not found with this Telegram ID.",
+    bn: "❌ এই টেলিগ্রাম আইডি দিয়ে কোনো ইউজার পাওয়া যায়নি।",
+    hi: "❌ इस टेलीग्राम ID से कोई यूजर नहीं मिला।",
   },
 };
 
@@ -278,11 +303,19 @@ serve(async (req) => {
     // Get user's current data including language
     const { data: currentUser } = await supabase
       .from('telegram_users')
-      .select('balance, last_daily_claim, language, referral_code, referral_count')
+      .select('balance, last_daily_claim, language, referral_code, referral_count, is_banned')
       .eq('telegram_id', telegramUser.id)
       .single();
 
     const userLang = (currentUser?.language || 'en') as Language;
+
+    // Check if user is banned
+    if (currentUser?.is_banned) {
+      await sendTelegramMessage(chatId, t('userBanned', userLang));
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     // Save message to database
     const { error: msgError } = await supabase
@@ -584,52 +617,111 @@ serve(async (req) => {
         });
       }
 
-      // Handle /top command for leaderboard
-      if (command === 'top') {
-        const subCommand = messageText.split(' ')[1]?.toLowerCase();
+      // Handle /top_balance command
+      if (command === 'top_balance') {
+        const { data: topUsers } = await supabase
+          .from('telegram_users')
+          .select('first_name, username, balance')
+          .eq('is_banned', false)
+          .order('balance', { ascending: false })
+          .limit(10);
 
-        if (!subCommand || (subCommand !== 'balance' && subCommand !== 'referrals')) {
-          await sendTelegramMessage(chatId, t('topUsage', userLang));
+        if (topUsers && topUsers.length > 0) {
+          const medals = ['🥇', '🥈', '🥉'];
+          const list = topUsers.map((user, index) => {
+            const medal = medals[index] || `${index + 1}.`;
+            const name = user.first_name || user.username || 'Unknown';
+            return `${medal} ${name} - <b>${user.balance}</b> credits`;
+          }).join('\n');
+
+          await sendTelegramMessage(chatId, t('topBalance', userLang, { list }));
+        }
+
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Handle /top_referrals command
+      if (command === 'top_referrals') {
+        const { data: topUsers } = await supabase
+          .from('telegram_users')
+          .select('first_name, username, referral_count')
+          .eq('is_banned', false)
+          .order('referral_count', { ascending: false })
+          .limit(10);
+
+        if (topUsers && topUsers.length > 0) {
+          const medals = ['🥇', '🥈', '🥉'];
+          const list = topUsers.map((user, index) => {
+            const medal = medals[index] || `${index + 1}.`;
+            const name = user.first_name || user.username || 'Unknown';
+            return `${medal} ${name} - <b>${user.referral_count || 0}</b> referrals`;
+          }).join('\n');
+
+          await sendTelegramMessage(chatId, t('topReferrals', userLang, { list }));
+        }
+
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Handle /ban command (admin only)
+      if (command === 'ban' || command === 'unban') {
+        // Check if user is admin
+        const { data: adminCheck } = await supabase
+          .from('admin_telegram_ids')
+          .select('id')
+          .eq('telegram_chat_id', telegramUser.id)
+          .eq('is_active', true)
+          .maybeSingle();
+
+        if (!adminCheck) {
+          await sendTelegramMessage(chatId, t('banNotAdmin', userLang));
           return new Response(JSON.stringify({ ok: true }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           });
         }
 
-        if (subCommand === 'balance') {
-          const { data: topUsers } = await supabase
-            .from('telegram_users')
-            .select('first_name, username, balance')
-            .order('balance', { ascending: false })
-            .limit(10);
-
-          if (topUsers && topUsers.length > 0) {
-            const medals = ['🥇', '🥈', '🥉'];
-            const list = topUsers.map((user, index) => {
-              const medal = medals[index] || `${index + 1}.`;
-              const name = user.first_name || user.username || 'Unknown';
-              return `${medal} ${name} - <b>${user.balance}</b> credits`;
-            }).join('\n');
-
-            await sendTelegramMessage(chatId, t('topBalance', userLang, { list }));
-          }
-        } else if (subCommand === 'referrals') {
-          const { data: topUsers } = await supabase
-            .from('telegram_users')
-            .select('first_name, username, referral_count')
-            .order('referral_count', { ascending: false })
-            .limit(10);
-
-          if (topUsers && topUsers.length > 0) {
-            const medals = ['🥇', '🥈', '🥉'];
-            const list = topUsers.map((user, index) => {
-              const medal = medals[index] || `${index + 1}.`;
-              const name = user.first_name || user.username || 'Unknown';
-              return `${medal} ${name} - <b>${user.referral_count || 0}</b> referrals`;
-            }).join('\n');
-
-            await sendTelegramMessage(chatId, t('topReferrals', userLang, { list }));
-          }
+        const targetId = messageText.split(' ')[1]?.trim();
+        
+        if (!targetId || isNaN(Number(targetId))) {
+          await sendTelegramMessage(chatId, t('banUsage', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
         }
+
+        // Find target user
+        const { data: targetUser } = await supabase
+          .from('telegram_users')
+          .select('telegram_id, first_name, username')
+          .eq('telegram_id', Number(targetId))
+          .maybeSingle();
+
+        if (!targetUser) {
+          await sendTelegramMessage(chatId, t('banUserNotFound', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const isBan = command === 'ban';
+        await supabase
+          .from('telegram_users')
+          .update({ 
+            is_banned: isBan,
+            banned_at: isBan ? new Date().toISOString() : null 
+          })
+          .eq('telegram_id', Number(targetId));
+
+        const userName = targetUser.first_name || targetUser.username || 'Unknown';
+        const msgKey = isBan ? 'banSuccess' : 'unbanSuccess';
+        await sendTelegramMessage(chatId, t(msgKey, userLang, {
+          telegramId: targetId,
+          userName,
+        }));
 
         return new Response(JSON.stringify({ ok: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
