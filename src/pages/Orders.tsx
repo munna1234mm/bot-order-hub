@@ -1,22 +1,25 @@
 import { useState } from 'react';
 import { Sidebar } from '@/components/Sidebar';
-import { StatsCard } from '@/components/StatsCard';
 import { OrdersTable } from '@/components/OrdersTable';
 import { OrderDetails } from '@/components/OrderDetails';
 import { StatusFilter } from '@/components/StatusFilter';
-import { mockOrders, getOrderStats, Order, OrderStatus } from '@/lib/mockData';
-import { Package, Clock, CheckCircle, DollarSign, TrendingUp } from 'lucide-react';
+import { mockOrders, Order, OrderStatus } from '@/lib/mockData';
+import { Search } from 'lucide-react';
 
-const Index = () => {
+const Orders = () => {
   const [orders, setOrders] = useState(mockOrders);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [activeStatus, setActiveStatus] = useState<OrderStatus | 'all'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const stats = getOrderStats();
-
-  const filteredOrders = activeStatus === 'all'
-    ? orders
-    : orders.filter(o => o.status === activeStatus);
+  const filteredOrders = orders.filter(order => {
+    const matchesStatus = activeStatus === 'all' || order.status === activeStatus;
+    const matchesSearch = 
+      order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.telegramUsername.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesStatus && matchesSearch;
+  });
 
   const statusCounts = {
     all: orders.length,
@@ -46,46 +49,27 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Sidebar />
 
-      {/* Main Content */}
       <main className="ml-64 p-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+          <h1 className="text-3xl font-bold text-foreground">Orders</h1>
           <p className="mt-1 text-muted-foreground">
-            Manage your Telegram bot orders
+            View and manage all orders from your Telegram bot
           </p>
         </div>
 
-        {/* Stats Grid */}
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <StatsCard
-            title="Total Orders"
-            value={stats.totalOrders}
-            icon={Package}
-            trend={{ value: 12, isPositive: true }}
-          />
-          <StatsCard
-            title="Pending"
-            value={stats.pendingOrders}
-            icon={Clock}
-          />
-          <StatsCard
-            title="Completed"
-            value={stats.completedOrders}
-            icon={CheckCircle}
-          />
-          <StatsCard
-            title="Revenue"
-            value={`$${stats.totalRevenue.toFixed(2)}`}
-            icon={DollarSign}
-            variant="primary"
-            trend={{ value: 8, isPositive: true }}
-          />
-        </div>
-
-        {/* Orders Section */}
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-foreground">Recent Orders</h2>
+        {/* Search */}
+        <div className="mb-6">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search orders..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-11 w-full rounded-lg border border-border bg-card pl-10 pr-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </div>
         </div>
 
         {/* Status Filter */}
@@ -103,6 +87,12 @@ const Index = () => {
           onSelectOrder={setSelectedOrder}
           selectedOrderId={selectedOrder?.id}
         />
+
+        {filteredOrders.length === 0 && (
+          <div className="mt-12 text-center">
+            <p className="text-lg text-muted-foreground">No orders found</p>
+          </div>
+        )}
       </main>
 
       {/* Order Details Sidebar */}
@@ -117,4 +107,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Orders;
