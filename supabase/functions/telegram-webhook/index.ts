@@ -52,7 +52,7 @@ serve(async (req) => {
     console.log('Message:', messageText);
 
     // Upsert user into database
-    const { error: userError } = await supabase
+    const { data: userData, error: userError } = await supabase
       .from('telegram_users')
       .upsert({
         telegram_id: telegramUser.id,
@@ -62,11 +62,20 @@ serve(async (req) => {
         last_active_at: new Date().toISOString(),
       }, {
         onConflict: 'telegram_id',
-      });
+      })
+      .select()
+      .single();
 
     if (userError) {
       console.error('User upsert error:', userError);
     }
+
+    // Get user's current balance
+    const { data: currentUser } = await supabase
+      .from('telegram_users')
+      .select('balance, last_daily_claim')
+      .eq('telegram_id', telegramUser.id)
+      .single();
 
     // Save message to database
     const { error: msgError } = await supabase
@@ -82,10 +91,70 @@ serve(async (req) => {
       console.error('Message insert error:', msgError);
     }
 
-    // Check for command and send auto-reply
+    // Handle commands
     if (messageText.startsWith('/')) {
       const command = messageText.split(' ')[0].toLowerCase().replace('/', '');
       
+      // Handle /start command - show balance
+      if (command === 'start') {
+        const balance = currentUser?.balance || 0;
+        const welcomeMessage = `🎉 <b>স্বাগতম!</b>\n\n💰 আপনার বর্তমান ব্যালেন্স: <b>${balance} ক্রেডিট</b>\n\n📌 <b>উপলব্ধ কমান্ড:</b>\n/daily - ডেইলি বোনাস নিন (প্রতি ২৪ ঘন্টায় ১ ক্রেডিট)\n/balance - ব্যালেন্স দেখুন`;
+        await sendTelegramMessage(chatId, welcomeMessage);
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Handle /balance command
+      if (command === 'balance') {
+        const balance = currentUser?.balance || 0;
+        await sendTelegramMessage(chatId, `💰 আপনার বর্তমান ব্যালেন্স: <b>${balance} ক্রেডিট</b>`);
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Handle /daily command - give 1 credit every 24 hours
+      if (command === 'daily') {
+        const lastClaim = currentUser?.last_daily_claim;
+        const now = new Date();
+        
+        if (lastClaim) {
+          const lastClaimDate = new Date(lastClaim);
+          const hoursSinceLastClaim = (now.getTime() - lastClaimDate.getTime()) / (1000 * 60 * 60);
+          
+          if (hoursSinceLastClaim < 24) {
+            const hoursRemaining = Math.ceil(24 - hoursSinceLastClaim);
+            const minutesRemaining = Math.ceil((24 - hoursSinceLastClaim) * 60) % 60;
+            await sendTelegramMessage(chatId, `⏰ আপনি ইতিমধ্যে আজকের বোনাস নিয়েছেন!\n\n⏳ পরবর্তী বোনাস পেতে অপেক্ষা করুন: <b>${hoursRemaining} ঘন্টা ${minutesRemaining} মিনিট</b>`);
+            return new Response(JSON.stringify({ ok: true }), {
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            });
+          }
+        }
+
+        // Give daily bonus
+        const newBalance = (currentUser?.balance || 0) + 1;
+        const { error: updateError } = await supabase
+          .from('telegram_users')
+          .update({
+            balance: newBalance,
+            last_daily_claim: now.toISOString(),
+          })
+          .eq('telegram_id', telegramUser.id);
+
+        if (updateError) {
+          console.error('Balance update error:', updateError);
+          await sendTelegramMessage(chatId, '❌ বোনাস প্রদানে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন।');
+        } else {
+          await sendTelegramMessage(chatId, `🎁 <b>ডেইলি বোনাস!</b>\n\n✅ আপনি +1 ক্রেডিট পেয়েছেন!\n💰 নতুন ব্যালেন্স: <b>${newBalance} ক্রেডিট</b>\n\n⏰ পরবর্তী বোনাস ২৪ ঘন্টা পর`);
+        }
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      
+      // Check for custom commands
       const { data: commandData } = await supabase
         .from('bot_commands')
         .select('response')
