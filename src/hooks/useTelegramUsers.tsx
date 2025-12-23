@@ -77,5 +77,5 @@ export function useTelegramUsers() {
     return lastActive > fiveMinutesAgo;
   });
 
-  return { users, activeUsers, loading };
+  return { users, activeUsers, loading, totalCount: users.length };
 }
