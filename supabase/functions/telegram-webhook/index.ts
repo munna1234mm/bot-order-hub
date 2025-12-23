@@ -13,14 +13,14 @@ type Language = 'en' | 'bn' | 'hi';
 
 const translations: Record<string, Record<Language, string>> = {
   welcome: {
-    en: "🎉 <b>Welcome!</b>\n\n💰 Your current balance: <b>{balance} credits</b>\n\n📌 <b>Available Commands:</b>\n/daily - Claim daily bonus (1 credit every 24 hours)\n/balance - Check your balance\n/referral - Get your referral link\n/language - Change language",
-    bn: "🎉 <b>স্বাগতম!</b>\n\n💰 আপনার বর্তমান ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n\n📌 <b>উপলব্ধ কমান্ড:</b>\n/daily - ডেইলি বোনাস নিন (প্রতি ২৪ ঘন্টায় ১ ক্রেডিট)\n/balance - ব্যালেন্স দেখুন\n/referral - রেফারেল লিংক পান\n/language - ভাষা পরিবর্তন করুন",
-    hi: "🎉 <b>स्वागत है!</b>\n\n💰 आपका वर्तमान बैलेंस: <b>{balance} क्रेडिट</b>\n\n📌 <b>उपलब्ध कमांड:</b>\n/daily - डेली बोनस लें (हर 24 घंटे में 1 क्रेडिट)\n/balance - बैलेंस देखें\n/referral - रेफरल लिंक पाएं\n/language - भाषा बदलें",
+    en: "🎉 <b>Welcome!</b>\n\n💰 Your current balance: <b>{balance} credits</b>\n\n📌 <b>Available Commands:</b>\n/daily - Claim daily bonus (1 credit every 24 hours)\n/balance - Check your balance\n/referral - Get your referral link\n/redeem CODE - Redeem a coupon code\n/language - Change language",
+    bn: "🎉 <b>স্বাগতম!</b>\n\n💰 আপনার বর্তমান ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n\n📌 <b>উপলব্ধ কমান্ড:</b>\n/daily - ডেইলি বোনাস নিন (প্রতি ২৪ ঘন্টায় ১ ক্রেডিট)\n/balance - ব্যালেন্স দেখুন\n/referral - রেফারেল লিংক পান\n/redeem CODE - কুপন কোড রিডিম করুন\n/language - ভাষা পরিবর্তন করুন",
+    hi: "🎉 <b>स्वागत है!</b>\n\n💰 आपका वर्तमान बैलेंस: <b>{balance} क्रेडिट</b>\n\n📌 <b>उपलब्ध कमांड:</b>\n/daily - डेली बोनस लें (हर 24 घंटे में 1 क्रेडिट)\n/balance - बैलेंस देखें\n/referral - रेफरल लिंक पाएं\n/redeem CODE - कूपन कोड रिडीम करें\n/language - भाषा बदलें",
   },
   welcomeReferred: {
-    en: "🎉 <b>Welcome!</b>\n\n🎁 You joined via referral and got <b>+1 bonus credit!</b>\n💰 Your current balance: <b>{balance} credits</b>\n\n📌 <b>Available Commands:</b>\n/daily - Claim daily bonus (1 credit every 24 hours)\n/balance - Check your balance\n/referral - Get your referral link\n/language - Change language",
-    bn: "🎉 <b>স্বাগতম!</b>\n\n🎁 আপনি রেফারেলের মাধ্যমে যোগ দিয়েছেন এবং <b>+১ বোনাস ক্রেডিট</b> পেয়েছেন!\n💰 আপনার বর্তমান ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n\n📌 <b>উপলব্ধ কমান্ড:</b>\n/daily - ডেইলি বোনাস নিন\n/balance - ব্যালেন্স দেখুন\n/referral - রেফারেল লিংক পান\n/language - ভাষা পরিবর্তন করুন",
-    hi: "🎉 <b>स्वागत है!</b>\n\n🎁 आप रेफरल से जुड़े और <b>+1 बोनस क्रेडिट</b> मिला!\n💰 आपका बैलेंस: <b>{balance} क्रेडिट</b>\n\n📌 <b>उपलब्ध कमांड:</b>\n/daily - डेली बोनस लें\n/balance - बैलेंस देखें\n/referral - रेफरल लिंक पाएं\n/language - भाषा बदलें",
+    en: "🎉 <b>Welcome!</b>\n\n🎁 You joined via referral and got <b>+1 bonus credit!</b>\n💰 Your current balance: <b>{balance} credits</b>\n\n📌 <b>Available Commands:</b>\n/daily - Claim daily bonus (1 credit every 24 hours)\n/balance - Check your balance\n/referral - Get your referral link\n/redeem CODE - Redeem a coupon code\n/language - Change language",
+    bn: "🎉 <b>স্বাগতম!</b>\n\n🎁 আপনি রেফারেলের মাধ্যমে যোগ দিয়েছেন এবং <b>+১ বোনাস ক্রেডিট</b> পেয়েছেন!\n💰 আপনার বর্তমান ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n\n📌 <b>উপলব্ধ কমান্ড:</b>\n/daily - ডেইলি বোনাস নিন\n/balance - ব্যালেন্স দেখুন\n/referral - রেফারেল লিংক পান\n/redeem CODE - কুপন কোড রিডিম করুন\n/language - ভাষা পরিবর্তন করুন",
+    hi: "🎉 <b>स्वागत है!</b>\n\n🎁 आप रेफरल से जुड़े और <b>+1 बोनस क्रेडिट</b> मिला!\n💰 आपका बैलेंस: <b>{balance} क्रेडिट</b>\n\n📌 <b>उपलब्ध कमांड:</b>\n/daily - डेली बोनस लें\n/balance - बैलेंस देखें\n/referral - रेफरल लिंक पाएं\n/redeem CODE - कूपन कोड रिडीम करें\n/language - भाषा बदलें",
   },
   balance: {
     en: "💰 Your current balance: <b>{balance} credits</b>",
@@ -45,7 +45,7 @@ const translations: Record<string, Record<Language, string>> = {
   languageSelect: {
     en: "🌐 <b>Select Language / ভাষা নির্বাচন করুন / भाषा चुनें</b>\n\n/lang_en - English 🇬🇧\n/lang_bn - বাংলা 🇧🇩\n/lang_hi - हिन्दी 🇮🇳",
     bn: "🌐 <b>Select Language / ভাষা নির্বাচন করুন / भाषा चुनें</b>\n\n/lang_en - English 🇬🇧\n/lang_bn - বাংলা 🇧🇩\n/lang_hi - हिन्दी 🇮🇳",
-    hi: "🌐 <b>Select Language / ভাষা নির্বাচন করুন / भाषा चुनें</b>\n\n/lang_en - English 🇬🇧\n/lang_bn - বাংলা 🇧🇩\n/lang_hi - हिন्दी 🇮🇳",
+    hi: "🌐 <b>Select Language / ভাষা নির্বাচন করুন / भाषा चुनें</b>\n\n/lang_en - English 🇬🇧\n/lang_bn - বাংলা 🇧🇩\n/lang_hi - हिन्दी 🇮🇳",
   },
   languageChanged: {
     en: "✅ Language changed to <b>English</b> 🇬🇧",
@@ -61,6 +61,31 @@ const translations: Record<string, Record<Language, string>> = {
     en: "🎉 <b>Referral Bonus!</b>\n\n👤 {userName} joined using your link!\n✅ You received <b>+1 credit</b>\n💰 New balance: <b>{balance} credits</b>\n👥 Total referrals: <b>{referralCount}</b>",
     bn: "🎉 <b>রেফারেল বোনাস!</b>\n\n👤 {userName} আপনার লিংক দিয়ে যোগ দিয়েছে!\n✅ আপনি <b>+১ ক্রেডিট</b> পেয়েছেন\n💰 নতুন ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n👥 মোট রেফারেল: <b>{referralCount}</b>",
     hi: "🎉 <b>रेफरल बोनस!</b>\n\n👤 {userName} आपके लिंक से जुड़ा!\n✅ आपको <b>+1 क्रेडिट</b> मिला\n💰 नया बैलेंस: <b>{balance} क्रेडिट</b>\n👥 कुल रेफरल: <b>{referralCount}</b>",
+  },
+  redeemUsage: {
+    en: "📝 <b>How to redeem:</b>\n\nUse: /redeem YOUR_CODE\n\nExample: /redeem BONUS2024",
+    bn: "📝 <b>রিডিম করার নিয়ম:</b>\n\nব্যবহার করুন: /redeem আপনার_কোড\n\nউদাহরণ: /redeem BONUS2024",
+    hi: "📝 <b>रिडीम करने का तरीका:</b>\n\nउपयोग करें: /redeem YOUR_CODE\n\nउदाहरण: /redeem BONUS2024",
+  },
+  redeemSuccess: {
+    en: "🎉 <b>Coupon Redeemed!</b>\n\n🎫 Code: <b>{code}</b>\n✅ You received <b>+{credits} credits</b>!\n💰 New balance: <b>{balance} credits</b>",
+    bn: "🎉 <b>কুপন রিডিম হয়েছে!</b>\n\n🎫 কোড: <b>{code}</b>\n✅ আপনি <b>+{credits} ক্রেডিট</b> পেয়েছেন!\n💰 নতুন ব্যালেন্স: <b>{balance} ক্রেডিট</b>",
+    hi: "🎉 <b>कूपन रिडीम हुआ!</b>\n\n🎫 कोड: <b>{code}</b>\n✅ आपको <b>+{credits} क्रेडिट</b> मिला!\n💰 नया बैलेंस: <b>{balance} क्रेडिट</b>",
+  },
+  redeemInvalid: {
+    en: "❌ Invalid or expired coupon code.",
+    bn: "❌ ভুল বা মেয়াদোত্তীর্ণ কুপন কোড।",
+    hi: "❌ गलत या समाप्त कूपन कोड।",
+  },
+  redeemAlreadyUsed: {
+    en: "❌ You have already used this coupon code.",
+    bn: "❌ আপনি এই কুপন কোড আগেই ব্যবহার করেছেন।",
+    hi: "❌ आप इस कूपन कोड का पहले ही उपयोग कर चुके हैं।",
+  },
+  redeemMaxUsed: {
+    en: "❌ This coupon code has reached its maximum usage limit.",
+    bn: "❌ এই কুপন কোড সর্বাধিক ব্যবহার সীমায় পৌঁছে গেছে।",
+    hi: "❌ इस कूपन कोड की अधिकतम उपयोग सीमा पूरी हो गई है।",
   },
 };
 
@@ -272,6 +297,94 @@ serve(async (req) => {
           .eq('telegram_id', telegramUser.id);
         
         await sendTelegramMessage(chatId, t('languageChanged', newLang));
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Handle /redeem command
+      if (command === 'redeem') {
+        const codeToRedeem = messageText.split(' ')[1]?.toUpperCase()?.trim();
+        
+        if (!codeToRedeem) {
+          await sendTelegramMessage(chatId, t('redeemUsage', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Check if coupon exists and is valid
+        const { data: coupon } = await supabase
+          .from('coupon_codes')
+          .select('*')
+          .eq('code', codeToRedeem)
+          .eq('is_active', true)
+          .maybeSingle();
+
+        if (!coupon) {
+          await sendTelegramMessage(chatId, t('redeemInvalid', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Check if coupon is expired
+        if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
+          await sendTelegramMessage(chatId, t('redeemInvalid', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Check if max uses reached
+        if (coupon.max_uses && coupon.current_uses >= coupon.max_uses) {
+          await sendTelegramMessage(chatId, t('redeemMaxUsed', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Check if user already redeemed this coupon
+        const { data: existingRedemption } = await supabase
+          .from('coupon_redemptions')
+          .select('id')
+          .eq('coupon_id', coupon.id)
+          .eq('telegram_user_id', telegramUser.id)
+          .maybeSingle();
+
+        if (existingRedemption) {
+          await sendTelegramMessage(chatId, t('redeemAlreadyUsed', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Redeem coupon - add credits to user
+        const newBalance = (currentUser?.balance || 0) + coupon.credits;
+        await supabase
+          .from('telegram_users')
+          .update({ balance: newBalance })
+          .eq('telegram_id', telegramUser.id);
+
+        // Record redemption
+        await supabase
+          .from('coupon_redemptions')
+          .insert({
+            coupon_id: coupon.id,
+            telegram_user_id: telegramUser.id,
+          });
+
+        // Update coupon usage count
+        await supabase
+          .from('coupon_codes')
+          .update({ current_uses: coupon.current_uses + 1 })
+          .eq('id', coupon.id);
+
+        await sendTelegramMessage(chatId, t('redeemSuccess', userLang, {
+          code: coupon.code,
+          credits: coupon.credits,
+          balance: newBalance,
+        }));
         return new Response(JSON.stringify({ ok: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
