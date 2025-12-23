@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-interface TelegramUser {
+export interface TelegramUser {
   id: string;
   telegram_id: number;
   first_name: string | null;
@@ -13,6 +13,7 @@ interface TelegramUser {
   last_daily_claim: string | null;
   is_banned: boolean;
   banned_at: string | null;
+  language: string;
 }
 
 export function useTelegramUsers() {
