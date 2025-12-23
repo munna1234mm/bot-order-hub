@@ -111,36 +111,34 @@ export const useCanvaProRequests = () => {
       if (requestError) throw requestError;
 
       // Send notification to user via edge function
-      const telegramBotToken = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
-      if (telegramBotToken) {
-        // Get user's language
-        const { data: userInfo } = await supabase
-          .from('telegram_users')
-          .select('language')
-          .eq('telegram_id', telegramUserId)
-          .single();
-        
-        const lang = userInfo?.language || 'en';
-        
-        const messages: Record<string, string> = {
-          en: "🎉 <b>Canva Pro (12 Month) Approved!</b>\n\n✅ Your account has been sent! Please check your Gmail inbox.\n📅 Validity: <b>12 Months</b>\n💰 5 credits have been deducted from your balance.",
-          bn: "🎉 <b>Canva Pro (১২ মাস) অনুমোদিত!</b>\n\n✅ আপনার অ্যাকাউন্ট পাঠানো হয়েছে! অনুগ্রহ করে আপনার জিমেইলের ইনবক্স চেক করুন।\n📅 মেয়াদ: <b>১২ মাস</b>\n💰 আপনার ব্যালেন্স থেকে ৫ ক্রেডিট কেটে নেওয়া হয়েছে।",
-          hi: "🎉 <b>Canva Pro (12 महीने) स्वीकृत!</b>\n\n✅ आपका अकाउंट भेज दिया गया है! कृपया अपना Gmail इनबॉक्स चेक करें।\n📅 वैधता: <b>12 महीने</b>\n💰 आपके बैलेंस से 5 क्रेडिट काटे गए हैं।"
-        };
+      // Get user's language
+      const { data: userInfo } = await supabase
+        .from('telegram_users')
+        .select('language')
+        .eq('telegram_id', telegramUserId)
+        .single();
+      
+      const lang = userInfo?.language || 'en';
+      
+      const messages: Record<string, string> = {
+        en: "🎉 <b>Canva Pro (12 Month) Approved!</b>\n\n✅ Your account has been created completely!\n📧 Please check your Gmail inbox.\n📅 Validity: <b>12 Months</b>\n💰 5 credits have been deducted from your balance.",
+        bn: "🎉 <b>Canva Pro (১২ মাস) অনুমোদিত!</b>\n\n✅ আপনার অ্যাকাউন্ট তৈরি করা হয়েছে সম্পূর্ণভাবে!\n📧 অনুগ্রহ করে আপনার জিমেইল ইনবক্স চেক করুন।\n📅 মেয়াদ: <b>১২ মাস</b>\n💰 আপনার ব্যালেন্স থেকে ৫ ক্রেডিট কেটে নেওয়া হয়েছে।",
+        hi: "🎉 <b>Canva Pro (12 महीने) स्वीकृत!</b>\n\n✅ आपका अकाउंट पूरी तरह से बनाया गया है!\n📧 कृपया अपना Gmail इनबॉक्स चेक करें।\n📅 वैधता: <b>12 महीने</b>\n💰 आपके बैलेंस से 5 क्रेडिट काटे गए हैं।"
+      };
 
-        try {
-          await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id: telegramUserId,
-              text: messages[lang] || messages.en,
-              parse_mode: 'HTML'
-            })
-          });
-        } catch (e) {
-          console.error('Failed to send Telegram notification:', e);
+      try {
+        const { error: sendError } = await supabase.functions.invoke('send-telegram-message', {
+          body: {
+            chatId: telegramUserId,
+            message: messages[lang] || messages.en
+          }
+        });
+
+        if (sendError) {
+          console.error('Failed to send Telegram notification:', sendError);
         }
+      } catch (e) {
+        console.error('Failed to send Telegram notification:', e);
       }
 
       toast.success('Request approved and 5 credits deducted');
