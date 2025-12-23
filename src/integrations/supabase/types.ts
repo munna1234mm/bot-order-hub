@@ -65,6 +65,36 @@ export type Database = {
         }
         Relationships: []
       }
+      canva_pro_requests: {
+        Row: {
+          created_at: string
+          gmail: string
+          id: string
+          processed_at: string | null
+          processed_by: string | null
+          status: string
+          telegram_user_id: number
+        }
+        Insert: {
+          created_at?: string
+          gmail: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          telegram_user_id: number
+        }
+        Update: {
+          created_at?: string
+          gmail?: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          telegram_user_id?: number
+        }
+        Relationships: []
+      }
       coupon_codes: {
         Row: {
           code: string
