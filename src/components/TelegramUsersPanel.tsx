@@ -1,4 +1,5 @@
 import { useTelegramUsers } from '@/hooks/useTelegramUsers';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Bot, Circle, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
@@ -6,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 export function TelegramUsersPanel() {
   const { users, activeUsers, loading } = useTelegramUsers();
+  const { t } = useLanguage();
 
   const getDisplayName = (user: typeof users[0]) => {
     if (user.first_name && user.last_name) {
@@ -29,9 +31,9 @@ export function TelegramUsersPanel() {
           <Bot className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="font-semibold text-foreground">Bot Users</h3>
+          <h3 className="font-semibold text-foreground">{t('botUsers')}</h3>
           <p className="text-xs text-muted-foreground">
-            {activeUsers.length} active • {users.length} total
+            {activeUsers.length} {t('active').toLowerCase()} • {users.length} total
           </p>
         </div>
       </div>
@@ -40,11 +42,11 @@ export function TelegramUsersPanel() {
         <div className="space-y-3 pr-4">
           {loading ? (
             <p className="text-sm text-muted-foreground text-center py-4">
-              Loading...
+              {t('loading')}
             </p>
           ) : users.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
-              No bot users yet
+              {t('noUsers')}
             </p>
           ) : (
             users.map((user, index) => (
@@ -83,7 +85,7 @@ export function TelegramUsersPanel() {
                   </div>
                   {isActive(user.last_active_at) ? (
                     <span className="text-[10px] text-status-delivered font-medium uppercase tracking-wider">
-                      Active
+                      {t('active')}
                     </span>
                   ) : (
                     <span className="text-[10px] text-muted-foreground">

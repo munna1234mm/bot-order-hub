@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useBotCommands } from '@/hooks/useBotCommands';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,6 +10,7 @@ import { cn } from '@/lib/utils';
 
 export function BotCommandsPanel() {
   const { commands, loading, addCommand, updateCommand, deleteCommand } = useBotCommands();
+  const { t } = useLanguage();
   const [isAdding, setIsAdding] = useState(false);
   const [newCommand, setNewCommand] = useState('');
   const [newResponse, setNewResponse] = useState('');
@@ -40,12 +42,12 @@ export function BotCommandsPanel() {
             <Terminal className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h3 className="font-semibold text-foreground">Bot Commands</h3>
-            <p className="text-xs text-muted-foreground">{commands.length} commands</p>
+            <h3 className="font-semibold text-foreground">{t('botCommands')}</h3>
+            <p className="text-xs text-muted-foreground">{commands.length} {t('command').toLowerCase()}s</p>
           </div>
         </div>
         <Button size="sm" onClick={() => setIsAdding(true)} disabled={isAdding}>
-          <Plus className="h-4 w-4 mr-1" /> Add
+          <Plus className="h-4 w-4 mr-1" /> {t('addCommand')}
         </Button>
       </div>
 
@@ -64,10 +66,10 @@ export function BotCommandsPanel() {
           />
           <div className="flex gap-2">
             <Button size="sm" onClick={handleAdd}>
-              <Check className="h-4 w-4 mr-1" /> Save
+              <Check className="h-4 w-4 mr-1" /> {t('save')}
             </Button>
             <Button size="sm" variant="ghost" onClick={() => setIsAdding(false)}>
-              <X className="h-4 w-4 mr-1" /> Cancel
+              <X className="h-4 w-4 mr-1" /> {t('cancel')}
             </Button>
           </div>
         </div>
@@ -75,9 +77,9 @@ export function BotCommandsPanel() {
 
       <div className="space-y-2 max-h-[400px] overflow-y-auto">
         {loading ? (
-          <p className="text-sm text-muted-foreground text-center py-4">Loading...</p>
+          <p className="text-sm text-muted-foreground text-center py-4">{t('loading')}</p>
         ) : commands.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-4">No commands yet</p>
+          <p className="text-sm text-muted-foreground text-center py-4">{t('noCommands')}</p>
         ) : (
           commands.map((cmd) => (
             <div
@@ -123,8 +125,8 @@ export function BotCommandsPanel() {
                     rows={2}
                   />
                   <div className="flex gap-2">
-                    <Button size="sm" onClick={() => handleEdit(cmd.id)}>Save</Button>
-                    <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}>Cancel</Button>
+                    <Button size="sm" onClick={() => handleEdit(cmd.id)}>{t('save')}</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}>{t('cancel')}</Button>
                   </div>
                 </div>
               ) : (

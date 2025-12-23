@@ -3,13 +3,16 @@ import { StatsCard } from '@/components/StatsCard';
 import { TelegramUsersPanel } from '@/components/TelegramUsersPanel';
 import { BotCommandsPanel } from '@/components/BotCommandsPanel';
 import { MessagesPanel } from '@/components/MessagesPanel';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import { useTelegramUsers } from '@/hooks/useTelegramUsers';
 import { useTelegramMessages } from '@/hooks/useTelegramMessages';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Users, MessageSquare, Coins, Bot } from 'lucide-react';
 
 const Index = () => {
   const { users, activeUsers } = useTelegramUsers();
   const { messages, totalCount: messageCount } = useTelegramMessages();
+  const { t } = useLanguage();
 
   // Calculate total balance across all users
   const totalBalance = users.reduce((sum, user) => sum + (user.balance || 0), 0);
@@ -21,34 +24,37 @@ const Index = () => {
       {/* Main Content */}
       <main className="ml-64 p-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-          <p className="mt-1 text-muted-foreground">
-            Manage your Telegram bot
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">{t('dashboard')}</h1>
+            <p className="mt-1 text-muted-foreground">
+              Manage your Telegram bot
+            </p>
+          </div>
+          <LanguageSelector />
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
           <StatsCard
-            title="Total Users"
+            title={t('totalUsers')}
             value={users.length}
             icon={Users}
             trend={{ value: activeUsers.length, isPositive: true }}
           />
           <StatsCard
-            title="Active Now"
+            title={t('activeUsers')}
             value={activeUsers.length}
             icon={Bot}
             variant="primary"
           />
           <StatsCard
-            title="Total Messages"
+            title={t('totalMessages')}
             value={messageCount}
             icon={MessageSquare}
           />
           <StatsCard
-            title="Total Credits"
+            title={t('credits')}
             value={totalBalance}
             icon={Coins}
           />
