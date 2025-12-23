@@ -105,6 +105,9 @@ export type Database = {
           last_active_at: string
           last_daily_claim: string | null
           last_name: string | null
+          referral_code: string | null
+          referral_count: number | null
+          referred_by: number | null
           telegram_id: number
           username: string | null
         }
@@ -117,6 +120,9 @@ export type Database = {
           last_active_at?: string
           last_daily_claim?: string | null
           last_name?: string | null
+          referral_code?: string | null
+          referral_count?: number | null
+          referred_by?: number | null
           telegram_id: number
           username?: string | null
         }
@@ -129,6 +135,9 @@ export type Database = {
           last_active_at?: string
           last_daily_claim?: string | null
           last_name?: string | null
+          referral_code?: string | null
+          referral_count?: number | null
+          referred_by?: number | null
           telegram_id?: number
           username?: string | null
         }
