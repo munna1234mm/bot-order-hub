@@ -13,9 +13,14 @@ type Language = 'en' | 'bn' | 'hi';
 
 const translations: Record<string, Record<Language, string>> = {
   welcome: {
-    en: "🎉 <b>Welcome!</b>\n\n💰 Your current balance: <b>{balance} credits</b>\n\n📌 <b>Available Commands:</b>\n/daily - Claim daily bonus (1 credit every 24 hours)\n/balance - Check your balance\n/language - Change language",
-    bn: "🎉 <b>স্বাগতম!</b>\n\n💰 আপনার বর্তমান ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n\n📌 <b>উপলব্ধ কমান্ড:</b>\n/daily - ডেইলি বোনাস নিন (প্রতি ২৪ ঘন্টায় ১ ক্রেডিট)\n/balance - ব্যালেন্স দেখুন\n/language - ভাষা পরিবর্তন করুন",
-    hi: "🎉 <b>स्वागत है!</b>\n\n💰 आपका वर्तमान बैलेंस: <b>{balance} क्रेडिट</b>\n\n📌 <b>उपलब्ध कमांड:</b>\n/daily - डेली बोनस लें (हर 24 घंटे में 1 क्रेडिट)\n/balance - बैलेंस देखें\n/language - भाषा बदलें",
+    en: "🎉 <b>Welcome!</b>\n\n💰 Your current balance: <b>{balance} credits</b>\n\n📌 <b>Available Commands:</b>\n/daily - Claim daily bonus (1 credit every 24 hours)\n/balance - Check your balance\n/referral - Get your referral link\n/language - Change language",
+    bn: "🎉 <b>স্বাগতম!</b>\n\n💰 আপনার বর্তমান ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n\n📌 <b>উপলব্ধ কমান্ড:</b>\n/daily - ডেইলি বোনাস নিন (প্রতি ২৪ ঘন্টায় ১ ক্রেডিট)\n/balance - ব্যালেন্স দেখুন\n/referral - রেফারেল লিংক পান\n/language - ভাষা পরিবর্তন করুন",
+    hi: "🎉 <b>स्वागत है!</b>\n\n💰 आपका वर्तमान बैलेंस: <b>{balance} क्रेडिट</b>\n\n📌 <b>उपलब्ध कमांड:</b>\n/daily - डेली बोनस लें (हर 24 घंटे में 1 क्रेडिट)\n/balance - बैलेंस देखें\n/referral - रेफरल लिंक पाएं\n/language - भाषा बदलें",
+  },
+  welcomeReferred: {
+    en: "🎉 <b>Welcome!</b>\n\n🎁 You joined via referral and got <b>+1 bonus credit!</b>\n💰 Your current balance: <b>{balance} credits</b>\n\n📌 <b>Available Commands:</b>\n/daily - Claim daily bonus (1 credit every 24 hours)\n/balance - Check your balance\n/referral - Get your referral link\n/language - Change language",
+    bn: "🎉 <b>স্বাগতম!</b>\n\n🎁 আপনি রেফারেলের মাধ্যমে যোগ দিয়েছেন এবং <b>+১ বোনাস ক্রেডিট</b> পেয়েছেন!\n💰 আপনার বর্তমান ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n\n📌 <b>উপলব্ধ কমান্ড:</b>\n/daily - ডেইলি বোনাস নিন\n/balance - ব্যালেন্স দেখুন\n/referral - রেফারেল লিংক পান\n/language - ভাষা পরিবর্তন করুন",
+    hi: "🎉 <b>स्वागत है!</b>\n\n🎁 आप रेफरल से जुड़े और <b>+1 बोनस क्रेडिट</b> मिला!\n💰 आपका बैलेंस: <b>{balance} क्रेडिट</b>\n\n📌 <b>उपलब्ध कमांड:</b>\n/daily - डेली बोनस लें\n/balance - बैलेंस देखें\n/referral - रेफरल लिंक पाएं\n/language - भाषा बदलें",
   },
   balance: {
     en: "💰 Your current balance: <b>{balance} credits</b>",
@@ -40,12 +45,22 @@ const translations: Record<string, Record<Language, string>> = {
   languageSelect: {
     en: "🌐 <b>Select Language / ভাষা নির্বাচন করুন / भाषा चुनें</b>\n\n/lang_en - English 🇬🇧\n/lang_bn - বাংলা 🇧🇩\n/lang_hi - हिन्दी 🇮🇳",
     bn: "🌐 <b>Select Language / ভাষা নির্বাচন করুন / भाषा चुनें</b>\n\n/lang_en - English 🇬🇧\n/lang_bn - বাংলা 🇧🇩\n/lang_hi - हिन्दी 🇮🇳",
-    hi: "🌐 <b>Select Language / ভাষা নির্বাচন করুন / भाषा चुनें</b>\n\n/lang_en - English 🇬🇧\n/lang_bn - বাংলা 🇧🇩\n/lang_hi - हिन्दी 🇮🇳",
+    hi: "🌐 <b>Select Language / ভাষা নির্বাচন করুন / भाषा चुनें</b>\n\n/lang_en - English 🇬🇧\n/lang_bn - বাংলা 🇧🇩\n/lang_hi - हिন्दी 🇮🇳",
   },
   languageChanged: {
     en: "✅ Language changed to <b>English</b> 🇬🇧",
     bn: "✅ ভাষা পরিবর্তন হয়েছে <b>বাংলা</b> 🇧🇩",
     hi: "✅ भाषा बदल गई <b>हिन्दी</b> 🇮🇳",
+  },
+  referralLink: {
+    en: "🔗 <b>Your Referral Link:</b>\n\nhttps://t.me/{botUsername}?start=ref_{referralCode}\n\n👥 Total Referrals: <b>{referralCount}</b>\n💰 You get <b>+1 credit</b> for each friend who joins!",
+    bn: "🔗 <b>আপনার রেফারেল লিংক:</b>\n\nhttps://t.me/{botUsername}?start=ref_{referralCode}\n\n👥 মোট রেফারেল: <b>{referralCount}</b>\n💰 প্রতিটি বন্ধু যোগ দিলে আপনি <b>+১ ক্রেডিট</b> পাবেন!",
+    hi: "🔗 <b>आपका रेफरल लिंक:</b>\n\nhttps://t.me/{botUsername}?start=ref_{referralCode}\n\n👥 कुल रेफरल: <b>{referralCount}</b>\n💰 हर दोस्त के जुड़ने पर आपको <b>+1 क्रेडिट</b> मिलेगा!",
+  },
+  referralBonus: {
+    en: "🎉 <b>Referral Bonus!</b>\n\n👤 {userName} joined using your link!\n✅ You received <b>+1 credit</b>\n💰 New balance: <b>{balance} credits</b>\n👥 Total referrals: <b>{referralCount}</b>",
+    bn: "🎉 <b>রেফারেল বোনাস!</b>\n\n👤 {userName} আপনার লিংক দিয়ে যোগ দিয়েছে!\n✅ আপনি <b>+১ ক্রেডিট</b> পেয়েছেন\n💰 নতুন ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n👥 মোট রেফারেল: <b>{referralCount}</b>",
+    hi: "🎉 <b>रेफरल बोनस!</b>\n\n👤 {userName} आपके लिंक से जुड़ा!\n✅ आपको <b>+1 क्रेडिट</b> मिला\n💰 नया बैलेंस: <b>{balance} क्रेडिट</b>\n👥 कुल रेफरल: <b>{referralCount}</b>",
   },
 };
 
@@ -100,7 +115,37 @@ serve(async (req) => {
     console.log('Telegram user:', JSON.stringify(telegramUser));
     console.log('Message:', messageText);
 
+    // Generate unique referral code for user
+    const generateReferralCode = (telegramId: number): string => {
+      return telegramId.toString(36).toUpperCase();
+    };
+
+    // Check if user exists
+    const { data: existingUser } = await supabase
+      .from('telegram_users')
+      .select('*')
+      .eq('telegram_id', telegramUser.id)
+      .maybeSingle();
+
+    const isNewUser = !existingUser;
+    let referrerId: number | null = null;
+
+    // Check for referral code in /start command
+    if (messageText.startsWith('/start ref_')) {
+      const refCode = messageText.replace('/start ref_', '').trim();
+      const { data: referrer } = await supabase
+        .from('telegram_users')
+        .select('telegram_id, balance, referral_count, language')
+        .eq('referral_code', refCode)
+        .maybeSingle();
+      
+      if (referrer && referrer.telegram_id !== telegramUser.id && isNewUser) {
+        referrerId = referrer.telegram_id;
+      }
+    }
+
     // Upsert user into database
+    const referralCode = generateReferralCode(telegramUser.id);
     const { error: userError } = await supabase
       .from('telegram_users')
       .upsert({
@@ -109,6 +154,8 @@ serve(async (req) => {
         last_name: telegramUser.last_name || null,
         username: telegramUser.username || null,
         last_active_at: new Date().toISOString(),
+        referral_code: referralCode,
+        ...(isNewUser && referrerId ? { referred_by: referrerId, balance: 1 } : {}),
       }, {
         onConflict: 'telegram_id',
       });
@@ -117,10 +164,41 @@ serve(async (req) => {
       console.error('User upsert error:', userError);
     }
 
+    // If new user was referred, give bonus to referrer
+    if (isNewUser && referrerId) {
+      const { data: referrer } = await supabase
+        .from('telegram_users')
+        .select('balance, referral_count, language')
+        .eq('telegram_id', referrerId)
+        .single();
+
+      if (referrer) {
+        const newBalance = (referrer.balance || 0) + 1;
+        const newReferralCount = (referrer.referral_count || 0) + 1;
+        const referrerLang = (referrer.language || 'en') as Language;
+
+        await supabase
+          .from('telegram_users')
+          .update({
+            balance: newBalance,
+            referral_count: newReferralCount,
+          })
+          .eq('telegram_id', referrerId);
+
+        // Notify referrer
+        const newUserName = telegramUser.first_name || telegramUser.username || 'Someone';
+        await sendTelegramMessage(referrerId, t('referralBonus', referrerLang, {
+          userName: newUserName,
+          balance: newBalance,
+          referralCount: newReferralCount,
+        }));
+      }
+    }
+
     // Get user's current data including language
     const { data: currentUser } = await supabase
       .from('telegram_users')
-      .select('balance, last_daily_claim, language')
+      .select('balance, last_daily_claim, language, referral_code, referral_count')
       .eq('telegram_id', telegramUser.id)
       .single();
 
@@ -144,10 +222,25 @@ serve(async (req) => {
     if (messageText.startsWith('/')) {
       const command = messageText.split(' ')[0].toLowerCase().replace('/', '');
       
-      // Handle /start command - show balance
-      if (command === 'start') {
+      // Handle /start command with referral
+      if (command === 'start' || messageText.startsWith('/start ref_')) {
         const balance = currentUser?.balance || 0;
-        await sendTelegramMessage(chatId, t('welcome', userLang, { balance }));
+        const welcomeKey = isNewUser && referrerId ? 'welcomeReferred' : 'welcome';
+        await sendTelegramMessage(chatId, t(welcomeKey, userLang, { balance }));
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Handle /referral command
+      if (command === 'referral') {
+        const botInfo = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getMe`).then(r => r.json());
+        const botUsername = botInfo.result?.username || 'your_bot';
+        await sendTelegramMessage(chatId, t('referralLink', userLang, {
+          botUsername,
+          referralCode: currentUser?.referral_code || generateReferralCode(telegramUser.id),
+          referralCount: currentUser?.referral_count || 0,
+        }));
         return new Response(JSON.stringify({ ok: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
