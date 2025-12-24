@@ -1,20 +1,57 @@
 import { Sidebar } from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, Bell, Shield, Database, Save } from 'lucide-react';
-import { useState } from 'react';
+import { MessageCircle, Bell, Shield, Database, Save, Loader2, Eye, EyeOff } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { useBotSettings } from '@/hooks/useBotSettings';
 
 const Settings = () => {
+  const { settings, loading, getSetting, updateSetting } = useBotSettings();
   const [botToken, setBotToken] = useState('');
+  const [showToken, setShowToken] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [notifications, setNotifications] = useState({
     newOrder: true,
     statusChange: true,
     cancelled: true,
   });
 
-  const handleSave = () => {
-    toast.success('Settings saved successfully');
+  // Load bot token from settings when available
+  useEffect(() => {
+    const token = getSetting('telegram_bot_token');
+    if (token) {
+      setBotToken(token);
+    }
+  }, [settings, getSetting]);
+
+  const handleSave = async () => {
+    if (!botToken.trim()) {
+      toast.error('Bot token is required');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await updateSetting('telegram_bot_token', botToken.trim());
+      toast.success('Bot token saved successfully! New bot is now active.');
+    } catch (error) {
+      console.error('Error saving bot token:', error);
+      toast.error('Failed to save bot token');
+    } finally {
+      setSaving(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Sidebar />
+        <main className="ml-64 p-8 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -47,15 +84,24 @@ const Settings = () => {
                 <label className="block text-sm font-medium text-foreground mb-2">
                   Bot Token
                 </label>
-                <input
-                  type="password"
-                  value={botToken}
-                  onChange={(e) => setBotToken(e.target.value)}
-                  placeholder="Enter your bot token from @BotFather"
-                  className="h-11 w-full rounded-lg border border-border bg-muted/50 px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                />
+                <div className="relative">
+                  <input
+                    type={showToken ? "text" : "password"}
+                    value={botToken}
+                    onChange={(e) => setBotToken(e.target.value)}
+                    placeholder="Enter your bot token from @BotFather"
+                    className="h-11 w-full rounded-lg border border-border bg-muted/50 px-4 pr-12 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowToken(!showToken)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showToken ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Get your token from @BotFather on Telegram
+                  Get your token from @BotFather on Telegram. Changing this will switch to a different bot.
                 </p>
               </div>
             </div>
@@ -131,9 +177,13 @@ const Settings = () => {
           </div>
 
           {/* Save Button */}
-          <Button onClick={handleSave} className="w-full" size="lg">
-            <Save className="h-4 w-4" />
-            Save Changes
+          <Button onClick={handleSave} className="w-full" size="lg" disabled={saving}>
+            {saving ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="h-4 w-4" />
+            )}
+            {saving ? 'Saving...' : 'Save Changes'}
           </Button>
         </div>
       </main>
