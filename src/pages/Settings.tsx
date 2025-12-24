@@ -1,15 +1,18 @@
 import { Sidebar } from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, Bell, Shield, Database, Save, Loader2, Eye, EyeOff } from 'lucide-react';
+import { MessageCircle, Bell, Shield, Database, Save, Loader2, Eye, EyeOff, CheckCircle2, XCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useBotSettings } from '@/hooks/useBotSettings';
+import { supabase } from '@/integrations/supabase/client';
 
 const Settings = () => {
   const { settings, loading, getSetting, updateSetting } = useBotSettings();
   const [botToken, setBotToken] = useState('');
   const [showToken, setShowToken] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [webhookStatus, setWebhookStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [botUsername, setBotUsername] = useState<string | null>(null);
   const [notifications, setNotifications] = useState({
     newOrder: true,
     statusChange: true,
@@ -31,12 +34,35 @@ const Settings = () => {
     }
 
     setSaving(true);
+    setWebhookStatus('idle');
+    setBotUsername(null);
+    
     try {
+      // First, setup webhook with the new token
+      toast.info('Verifying bot token and setting up webhook...');
+      
+      const { data, error } = await supabase.functions.invoke('setup-webhook', {
+        body: { botToken: botToken.trim() }
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Failed to setup webhook');
+      }
+
+      if (data?.error) {
+        throw new Error(data.details || data.error);
+      }
+
+      // If webhook setup successful, save the token to database
       await updateSetting('telegram_bot_token', botToken.trim());
-      toast.success('Bot token saved successfully! New bot is now active.');
+      
+      setWebhookStatus('success');
+      setBotUsername(data.botUsername);
+      toast.success(`Bot @${data.botUsername} connected successfully with webhook!`);
     } catch (error) {
       console.error('Error saving bot token:', error);
-      toast.error('Failed to save bot token');
+      setWebhookStatus('error');
+      toast.error(error instanceof Error ? error.message : 'Failed to save bot token');
     } finally {
       setSaving(false);
     }
@@ -101,8 +127,22 @@ const Settings = () => {
                   </button>
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Get your token from @BotFather on Telegram. Changing this will switch to a different bot.
+                  Get your token from @BotFather on Telegram. Saving will automatically set up the webhook.
                 </p>
+                
+                {/* Webhook Status */}
+                {webhookStatus === 'success' && botUsername && (
+                  <div className="mt-3 flex items-center gap-2 text-sm text-green-600 bg-green-50 dark:bg-green-950/30 p-3 rounded-lg">
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span>Bot @{botUsername} connected with webhook active</span>
+                  </div>
+                )}
+                {webhookStatus === 'error' && (
+                  <div className="mt-3 flex items-center gap-2 text-sm text-red-600 bg-red-50 dark:bg-red-950/30 p-3 rounded-lg">
+                    <XCircle className="h-4 w-4" />
+                    <span>Failed to setup webhook. Please check the token and try again.</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
