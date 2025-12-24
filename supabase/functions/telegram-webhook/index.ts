@@ -6,7 +6,32 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN');
+// Bot token will be fetched from database
+let TELEGRAM_BOT_TOKEN: string | null = null;
+
+async function initBotToken(supabase: any): Promise<void> {
+  if (TELEGRAM_BOT_TOKEN) return;
+  
+  const { data, error } = await supabase
+    .from('bot_settings')
+    .select('value')
+    .eq('key', 'telegram_bot_token')
+    .single();
+  
+  if (data?.value) {
+    TELEGRAM_BOT_TOKEN = data.value;
+    return;
+  }
+  
+  // Fallback to env variable
+  const envToken = Deno.env.get('TELEGRAM_BOT_TOKEN');
+  if (envToken) {
+    TELEGRAM_BOT_TOKEN = envToken;
+    return;
+  }
+  
+  throw new Error('Bot token not configured');
+}
 
 // Multi-language translations
 type Language = 'en' | 'bn' | 'hi';
@@ -235,6 +260,9 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Initialize bot token from database or env
+    await initBotToken(supabase);
 
     const update = await req.json();
     console.log('Telegram update received:', JSON.stringify(update));

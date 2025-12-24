@@ -72,13 +72,32 @@ export function useBotSettings() {
   };
 
   const updateSetting = async (key: string, value: string) => {
-    const { error } = await supabase
+    // First try to update existing setting
+    const { data: existingSetting, error: checkError } = await supabase
       .from('bot_settings')
-      .update({ value })
-      .eq('key', key);
+      .select('id')
+      .eq('key', key)
+      .maybeSingle();
 
-    if (error) {
-      throw error;
+    if (existingSetting) {
+      // Update existing setting
+      const { error } = await supabase
+        .from('bot_settings')
+        .update({ value })
+        .eq('key', key);
+
+      if (error) {
+        throw error;
+      }
+    } else {
+      // Insert new setting
+      const { error } = await supabase
+        .from('bot_settings')
+        .insert({ key, value });
+
+      if (error) {
+        throw error;
+      }
     }
   };
 
