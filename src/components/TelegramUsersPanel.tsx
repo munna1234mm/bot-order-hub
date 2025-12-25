@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useTelegramUsers } from '@/hooks/useTelegramUsers';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Bot, Circle, Coins, Ban, CheckCircle, Plus, Minus, Users } from 'lucide-react';
+import { Bot, Circle, Coins, Ban, CheckCircle, Plus, Minus, Users, Send, Loader2, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
@@ -25,6 +26,12 @@ export function TelegramUsersPanel() {
   const [creditAmount, setCreditAmount] = useState<string>('');
   const [updatingCredits, setUpdatingCredits] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  
+  // Message sending states
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [messageUser, setMessageUser] = useState<typeof users[0] | null>(null);
+  const [messageText, setMessageText] = useState('');
+  const [sendingMessage, setSendingMessage] = useState(false);
 
   const getDisplayName = (user: typeof users[0]) => {
     if (user.first_name && user.last_name) {
@@ -108,6 +115,40 @@ export function TelegramUsersPanel() {
     setSelectedUser(user);
     setCreditAmount('');
     setDialogOpen(true);
+  };
+
+  const openMessageDialog = (user: typeof users[0]) => {
+    setMessageUser(user);
+    setMessageText('');
+    setMessageDialogOpen(true);
+  };
+
+  const handleSendMessage = async () => {
+    if (!messageUser || !messageText.trim()) {
+      toast.error('Please enter a message');
+      return;
+    }
+
+    setSendingMessage(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-telegram-message', {
+        body: {
+          chatId: messageUser.telegram_id,
+          message: messageText.trim()
+        }
+      });
+
+      if (error) throw error;
+
+      toast.success(`Message sent to ${getDisplayName(messageUser)}`);
+      setMessageText('');
+      setMessageDialogOpen(false);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error('Failed to send message');
+    } finally {
+      setSendingMessage(false);
+    }
   };
 
   return (
@@ -239,6 +280,59 @@ export function TelegramUsersPanel() {
                       </div>
                     </DialogContent>
                   </Dialog>
+                  
+                  {/* Send Message Dialog */}
+                  <Dialog open={messageDialogOpen && messageUser?.id === user.id} onOpenChange={(open) => {
+                    if (!open) setMessageDialogOpen(false);
+                  }}>
+                    <DialogTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8 w-8 p-0"
+                        onClick={() => openMessageDialog(user)}
+                        title="Send message"
+                      >
+                        <MessageSquare className="h-4 w-4 text-primary" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[400px]">
+                      <DialogHeader>
+                        <DialogTitle>Send Message to {getDisplayName(user)}</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <div className="text-sm text-muted-foreground">
+                          Telegram ID: {user.telegram_id}
+                        </div>
+                        <Textarea
+                          placeholder="Type your message here..."
+                          value={messageText}
+                          onChange={(e) => setMessageText(e.target.value)}
+                          rows={4}
+                          disabled={sendingMessage}
+                          className="resize-none"
+                        />
+                        <Button
+                          onClick={handleSendMessage}
+                          disabled={sendingMessage || !messageText.trim()}
+                          className="w-full"
+                        >
+                          {sendingMessage ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Sending...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="h-4 w-4 mr-2" />
+                              Send Message
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  
                   <Button
                     size="sm"
                     variant={user.is_banned ? "outline" : "destructive"}

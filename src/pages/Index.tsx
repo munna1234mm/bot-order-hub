@@ -11,6 +11,7 @@ import AdminTelegramIdsPanel from '@/components/AdminTelegramIdsPanel';
 import { CanvaProRequestsPanel } from '@/components/CanvaProRequestsPanel';
 import { ServicesPanel } from '@/components/ServicesPanel';
 import { ReferralBonusPanel } from '@/components/ReferralBonusPanel';
+import { BroadcastMessagePanel } from '@/components/BroadcastMessagePanel';
 import { useTelegramUsers } from '@/hooks/useTelegramUsers';
 import { useTelegramMessages } from '@/hooks/useTelegramMessages';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -90,6 +91,7 @@ const Index = () => {
 
           {/* Right Sidebar - Bot Stats & Commands */}
           <div className="lg:col-span-1 space-y-6">
+            <BroadcastMessagePanel />
             <AdminTelegramIdsPanel />
             <ReferralBonusPanel />
             <TelegramUsersPanel />
