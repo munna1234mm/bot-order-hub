@@ -999,7 +999,11 @@ serve(async (req) => {
           const username = telegramUser.username || 'no_username';
           
           for (const admin of adminIds) {
-            await sendTelegramMessage(admin.telegram_chat_id, t('chatgptAdminNotification', 'en', {
+            const adminChatId = Number(admin.telegram_chat_id);
+            // Never send admin-only notification to the same chat that placed the order
+            if (adminChatId === chatId) continue;
+
+            await sendTelegramMessage(adminChatId, t('chatgptAdminNotification', 'en', {
               userName,
               username,
               telegramId: telegramUser.id,
