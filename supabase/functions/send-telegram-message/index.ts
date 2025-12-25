@@ -63,6 +63,14 @@ serve(async (req) => {
     console.log('Telegram API response:', result);
 
     if (!result.ok) {
+      // Handle blocked users gracefully - don't throw error, just log and return success
+      if (result.error_code === 403) {
+        console.log(`User ${chatId} has blocked the bot, skipping...`);
+        return new Response(
+          JSON.stringify({ success: true, skipped: true, reason: 'User blocked bot' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
       throw new Error(result.description || 'Failed to send message');
     }
 
