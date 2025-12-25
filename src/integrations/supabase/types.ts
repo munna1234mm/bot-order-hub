@@ -122,6 +122,42 @@ export type Database = {
         }
         Relationships: []
       }
+      chatgpt_orders: {
+        Row: {
+          admin_message: string | null
+          created_at: string
+          gmail: string | null
+          id: string
+          password: string | null
+          processed_at: string | null
+          processed_by: string | null
+          status: string
+          telegram_user_id: number
+        }
+        Insert: {
+          admin_message?: string | null
+          created_at?: string
+          gmail?: string | null
+          id?: string
+          password?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          telegram_user_id: number
+        }
+        Update: {
+          admin_message?: string | null
+          created_at?: string
+          gmail?: string | null
+          id?: string
+          password?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          telegram_user_id?: number
+        }
+        Relationships: []
+      }
       coupon_codes: {
         Row: {
           code: string

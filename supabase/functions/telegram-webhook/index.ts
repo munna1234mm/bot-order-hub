@@ -245,6 +245,27 @@ const translations: Record<string, Record<Language, string>> = {
     bn: "🔔 <b>নতুন Canva Pro রিকোয়েস্ট!</b>\n\n👤 ইউজার: {userName} (@{username})\n🆔 টেলিগ্রাম ID: {telegramId}\n📧 জিমেইল: {gmail}\n\n⏳ অনুমোদনের অপেক্ষায়",
     hi: "🔔 <b>नई Canva Pro रिक्वेस्ट!</b>\n\n👤 यूजर: {userName} (@{username})\n🆔 टेलीग्राम ID: {telegramId}\n📧 Gmail: {gmail}\n\n⏳ अप्रूवल पेंडिंग",
   },
+  // ChatGPT 17 Month translations
+  chatgptAskWait: {
+    en: "🤖 <b>ChatGPT Plus (17 Month) Request</b>\n\n💰 Cost: <b>6 credits</b>\n📅 Duration: <b>17 Months</b>\n\n✅ Your request has been submitted!\n💰 6 credits have been deducted.\n\n⏳ Please wait for admin to send your account details.",
+    bn: "🤖 <b>ChatGPT Plus (১৭ মাস) রিকোয়েস্ট</b>\n\n💰 খরচ: <b>৬ ক্রেডিট</b>\n📅 মেয়াদ: <b>১৭ মাস</b>\n\n✅ আপনার রিকোয়েস্ট জমা হয়েছে!\n💰 ৬ ক্রেডিট কেটে নেওয়া হয়েছে।\n\n⏳ অ্যাডমিন আপনার অ্যাকাউন্টের তথ্য পাঠাবে, অনুগ্রহ করে অপেক্ষা করুন।",
+    hi: "🤖 <b>ChatGPT Plus (17 महीने) रिक्वेस्ट</b>\n\n💰 लागत: <b>6 क्रेडिट</b>\n📅 अवधि: <b>17 महीने</b>\n\n✅ आपकी रिक्वेस्ट जमा हो गई!\n💰 6 क्रेडिट काटे गए।\n\n⏳ कृपया एडमिन द्वारा अकाउंट डिटेल्स भेजने का इंतजार करें।",
+  },
+  chatgptInsufficientBalance: {
+    en: "❌ <b>Insufficient Balance!</b>\n\n💰 Your balance: <b>{balance} credits</b>\n📌 Required: <b>6 credits</b>\n\nPlease deposit more credits first using /deposit",
+    bn: "❌ <b>পর্যাপ্ত ব্যালেন্স নেই!</b>\n\n💰 আপনার ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n📌 প্রয়োজন: <b>৬ ক্রেডিট</b>\n\n/deposit ব্যবহার করে আরো ক্রেডিট জমা দিন",
+    hi: "❌ <b>अपर्याप्त बैलेंस!</b>\n\n💰 आपका बैलेंस: <b>{balance} क्रेडिट</b>\n📌 आवश्यक: <b>6 क्रेडिट</b>\n\nकृपया /deposit का उपयोग करके पहले अधिक क्रेडिट जमा करें",
+  },
+  chatgptRequestPending: {
+    en: "⏳ <b>You already have a pending ChatGPT request!</b>\n\nPlease wait for admin to process your request.",
+    bn: "⏳ <b>আপনার ইতিমধ্যে একটি ChatGPT রিকোয়েস্ট পেন্ডিং আছে!</b>\n\nঅনুগ্রহ করে অ্যাডমিনের প্রসেসের জন্য অপেক্ষা করুন।",
+    hi: "⏳ <b>आपकी पहले से एक ChatGPT रिक्वेस्ट पेंडिंग है!</b>\n\nकृपया एडमिन द्वारा प्रोसेसिंग का इंतजार करें।",
+  },
+  chatgptAdminNotification: {
+    en: "🔔 <b>New ChatGPT Plus (17 Month) Order!</b>\n\n👤 User: {userName} (@{username})\n🆔 Telegram ID: {telegramId}\n\n⏳ Please send Gmail + Password to user.",
+    bn: "🔔 <b>নতুন ChatGPT Plus (১৭ মাস) অর্ডার!</b>\n\n👤 ইউজার: {userName} (@{username})\n🆔 টেলিগ্রাম ID: {telegramId}\n\n⏳ অনুগ্রহ করে ইউজারকে জিমেইল + পাসওয়ার্ড পাঠান।",
+    hi: "🔔 <b>नई ChatGPT Plus (17 महीने) ऑर्डर!</b>\n\n👤 यूजर: {userName} (@{username})\n🆔 टेलीग्राम ID: {telegramId}\n\n⏳ कृपया यूजर को Gmail + पासवर्ड भेजें।",
+  },
 };
 
 function t(key: string, lang: Language, replacements: Record<string, string | number> = {}): string {
@@ -867,6 +888,87 @@ serve(async (req) => {
 
         // Ask for Gmail
         await sendTelegramMessage(chatId, t('canvaProAskGmail', userLang));
+
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Handle /chatgpt_17_month command
+      if (command === 'chatgpt_17_month') {
+        const userBalance = currentUser?.balance || 0;
+
+        // Check if user has enough balance (6 credits)
+        if (userBalance < 6) {
+          await sendTelegramMessage(chatId, t('chatgptInsufficientBalance', userLang, { balance: userBalance }));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Check if user already has a pending request
+        const { data: pendingRequest } = await supabase
+          .from('chatgpt_orders')
+          .select('id')
+          .eq('telegram_user_id', telegramUser.id)
+          .eq('status', 'pending')
+          .maybeSingle();
+
+        if (pendingRequest) {
+          await sendTelegramMessage(chatId, t('chatgptRequestPending', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Deduct 6 credits
+        const newBalance = userBalance - 6;
+        await supabase
+          .from('telegram_users')
+          .update({ balance: newBalance })
+          .eq('telegram_id', telegramUser.id);
+
+        // Create ChatGPT order
+        const { error: orderError } = await supabase
+          .from('chatgpt_orders')
+          .insert({
+            telegram_user_id: telegramUser.id,
+            status: 'pending'
+          });
+
+        if (orderError) {
+          console.error('ChatGPT order error:', orderError);
+          // Refund credits if order creation failed
+          await supabase
+            .from('telegram_users')
+            .update({ balance: userBalance })
+            .eq('telegram_id', telegramUser.id);
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Notify admins
+        const { data: adminIds } = await supabase
+          .from('admin_telegram_ids')
+          .select('telegram_chat_id')
+          .eq('is_active', true);
+
+        if (adminIds && adminIds.length > 0) {
+          const userName = telegramUser.first_name || 'Unknown';
+          const username = telegramUser.username || 'no_username';
+          
+          for (const admin of adminIds) {
+            await sendTelegramMessage(admin.telegram_chat_id, t('chatgptAdminNotification', 'en', {
+              userName,
+              username,
+              telegramId: telegramUser.id,
+            }));
+          }
+        }
+
+        // Tell user to wait
+        await sendTelegramMessage(chatId, t('chatgptAskWait', userLang));
 
         return new Response(JSON.stringify({ ok: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },

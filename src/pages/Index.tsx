@@ -12,6 +12,7 @@ import { CanvaProRequestsPanel } from '@/components/CanvaProRequestsPanel';
 import { ServicesPanel } from '@/components/ServicesPanel';
 import { ReferralBonusPanel } from '@/components/ReferralBonusPanel';
 import { BroadcastMessagePanel } from '@/components/BroadcastMessagePanel';
+import { ChatGPTOrdersPanel } from '@/components/ChatGPTOrdersPanel';
 import { useTelegramUsers } from '@/hooks/useTelegramUsers';
 import { useTelegramMessages } from '@/hooks/useTelegramMessages';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -76,6 +77,11 @@ const Index = () => {
         {/* Canva Pro Requests Panel */}
         <div className="mb-6">
           <CanvaProRequestsPanel />
+        </div>
+
+        {/* ChatGPT Orders Panel */}
+        <div className="mb-6">
+          <ChatGPTOrdersPanel />
         </div>
 
         {/* Services Panel */}
