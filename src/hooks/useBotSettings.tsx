@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface BotSetting {
@@ -66,18 +66,22 @@ export function useBotSettings() {
     };
   }, []);
 
-  const getSetting = (key: string): string | null => {
-    const setting = settings.find(s => s.key === key);
+  const getSetting = useCallback((key: string): string | null => {
+    const setting = settings.find((s) => s.key === key);
     return setting ? setting.value : null;
-  };
+  }, [settings]);
 
-  const updateSetting = async (key: string, value: string) => {
+  const updateSetting = useCallback(async (key: string, value: string) => {
     // First try to update existing setting
     const { data: existingSetting, error: checkError } = await supabase
       .from('bot_settings')
       .select('id')
       .eq('key', key)
       .maybeSingle();
+
+    if (checkError) {
+      throw checkError;
+    }
 
     if (existingSetting) {
       // Update existing setting
@@ -99,7 +103,7 @@ export function useBotSettings() {
         throw error;
       }
     }
-  };
+  }, []);
 
   return { settings, loading, getSetting, updateSetting };
 }
