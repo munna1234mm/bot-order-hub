@@ -33,6 +33,17 @@ async function initBotToken(supabase: any): Promise<void> {
   throw new Error('Bot token not configured');
 }
 
+async function isBotActive(supabase: any): Promise<boolean> {
+  const { data } = await supabase
+    .from('bot_settings')
+    .select('value')
+    .eq('key', 'bot_active')
+    .single();
+  
+  // Default to active if not set
+  return data?.value !== 'false';
+}
+
 // Multi-language translations
 type Language = 'en' | 'bn' | 'hi';
 
@@ -263,6 +274,15 @@ serve(async (req) => {
 
     // Initialize bot token from database or env
     await initBotToken(supabase);
+
+    // Check if bot is active
+    const botIsActive = await isBotActive(supabase);
+    if (!botIsActive) {
+      console.log('Bot is currently disabled, ignoring message');
+      return new Response(JSON.stringify({ ok: true, message: 'Bot is disabled' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     const update = await req.json();
     console.log('Telegram update received:', JSON.stringify(update));
