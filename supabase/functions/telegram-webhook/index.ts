@@ -246,10 +246,15 @@ const translations: Record<string, Record<Language, string>> = {
     hi: "🔔 <b>नई Canva Pro रिक्वेस्ट!</b>\n\n👤 यूजर: {userName} (@{username})\n🆔 टेलीग्राम ID: {telegramId}\n📧 Gmail: {gmail}\n\n⏳ अप्रूवल पेंडिंग",
   },
   // ChatGPT 17 Month translations
+  chatgptConfirmation: {
+    en: "🤖 <b>ChatGPT Plus (17 Month) Service</b>\n\n💰 Cost: <b>6 credits</b>\n📅 Duration: <b>17 Months</b>\n💰 Your balance: <b>{balance} credits</b>\n\n⚠️ <b>6 credits will be deducted from your account!</b>\n\n✅ To confirm your order, send:\n/confirm_chatgpt",
+    bn: "🤖 <b>ChatGPT Plus (১৭ মাস) সার্ভিস</b>\n\n💰 খরচ: <b>৬ ক্রেডিট</b>\n📅 মেয়াদ: <b>১৭ মাস</b>\n💰 আপনার ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n\n⚠️ <b>আপনার একাউন্ট থেকে ৬ ক্রেডিট কেটে নেওয়া হবে!</b>\n\n✅ অর্ডার নিশ্চিত করতে পাঠান:\n/confirm_chatgpt",
+    hi: "🤖 <b>ChatGPT Plus (17 महीने) सर्विस</b>\n\n💰 लागत: <b>6 क्रेडिट</b>\n📅 अवधि: <b>17 महीने</b>\n💰 आपका बैलेंस: <b>{balance} क्रेडिट</b>\n\n⚠️ <b>आपके अकाउंट से 6 क्रेडिट काटे जाएंगे!</b>\n\n✅ ऑर्डर कन्फर्म करने के लिए भेजें:\n/confirm_chatgpt",
+  },
   chatgptAskWait: {
-    en: "🤖 <b>ChatGPT Plus (17 Month) Request</b>\n\n💰 Cost: <b>6 credits</b>\n📅 Duration: <b>17 Months</b>\n\n✅ Your request has been submitted!\n💰 6 credits have been deducted.\n\n⏳ Please wait for admin to send your account details.",
-    bn: "🤖 <b>ChatGPT Plus (১৭ মাস) রিকোয়েস্ট</b>\n\n💰 খরচ: <b>৬ ক্রেডিট</b>\n📅 মেয়াদ: <b>১৭ মাস</b>\n\n✅ আপনার রিকোয়েস্ট জমা হয়েছে!\n💰 ৬ ক্রেডিট কেটে নেওয়া হয়েছে।\n\n⏳ অ্যাডমিন আপনার অ্যাকাউন্টের তথ্য পাঠাবে, অনুগ্রহ করে অপেক্ষা করুন।",
-    hi: "🤖 <b>ChatGPT Plus (17 महीने) रिक्वेस्ट</b>\n\n💰 लागत: <b>6 क्रेडिट</b>\n📅 अवधि: <b>17 महीने</b>\n\n✅ आपकी रिक्वेस्ट जमा हो गई!\n💰 6 क्रेडिट काटे गए।\n\n⏳ कृपया एडमिन द्वारा अकाउंट डिटेल्स भेजने का इंतजार करें।",
+    en: "🤖 <b>ChatGPT Plus (17 Month) Request</b>\n\n✅ Your order has been confirmed!\n💰 6 credits have been deducted.\n\n⏳ Please wait for admin to send your account details (Gmail + Password).",
+    bn: "🤖 <b>ChatGPT Plus (১৭ মাস) রিকোয়েস্ট</b>\n\n✅ আপনার অর্ডার নিশ্চিত হয়েছে!\n💰 ৬ ক্রেডিট কেটে নেওয়া হয়েছে।\n\n⏳ অ্যাডমিন আপনাকে অ্যাকাউন্টের তথ্য (জিমেইল + পাসওয়ার্ড) পাঠাবে, অনুগ্রহ করে অপেক্ষা করুন।",
+    hi: "🤖 <b>ChatGPT Plus (17 महीने) रिक्वेस्ट</b>\n\n✅ आपका ऑर्डर कन्फर्म हो गया!\n💰 6 क्रेडिट काटे गए।\n\n⏳ कृपया एडमिन द्वारा अकाउंट डिटेल्स (Gmail + पासवर्ड) भेजने का इंतजार करें।",
   },
   chatgptInsufficientBalance: {
     en: "❌ <b>Insufficient Balance!</b>\n\n💰 Your balance: <b>{balance} credits</b>\n📌 Required: <b>6 credits</b>\n\nPlease deposit more credits first using /deposit",
@@ -262,9 +267,9 @@ const translations: Record<string, Record<Language, string>> = {
     hi: "⏳ <b>आपकी पहले से एक ChatGPT रिक्वेस्ट पेंडिंग है!</b>\n\nकृपया एडमिन द्वारा प्रोसेसिंग का इंतजार करें।",
   },
   chatgptAdminNotification: {
-    en: "🔔 <b>New ChatGPT Plus (17 Month) Order!</b>\n\n👤 User: {userName} (@{username})\n🆔 Telegram ID: {telegramId}\n\n⏳ Please send Gmail + Password to user.",
-    bn: "🔔 <b>নতুন ChatGPT Plus (১৭ মাস) অর্ডার!</b>\n\n👤 ইউজার: {userName} (@{username})\n🆔 টেলিগ্রাম ID: {telegramId}\n\n⏳ অনুগ্রহ করে ইউজারকে জিমেইল + পাসওয়ার্ড পাঠান।",
-    hi: "🔔 <b>नई ChatGPT Plus (17 महीने) ऑर्डर!</b>\n\n👤 यूजर: {userName} (@{username})\n🆔 टेलीग्राम ID: {telegramId}\n\n⏳ कृपया यूजर को Gmail + पासवर्ड भेजें।",
+    en: "🔔 <b>New ChatGPT Plus (17 Month) Order!</b>\n\n👤 User: {userName} (@{username})\n🆔 Telegram ID: {telegramId}\n\n⏳ Please send Gmail + Password to user from admin panel.",
+    bn: "🔔 <b>নতুন ChatGPT Plus (১৭ মাস) অর্ডার!</b>\n\n👤 ইউজার: {userName} (@{username})\n🆔 টেলিগ্রাম ID: {telegramId}\n\n⏳ অ্যাডমিন প্যানেল থেকে ইউজারকে জিমেইল + পাসওয়ার্ড পাঠান।",
+    hi: "🔔 <b>नई ChatGPT Plus (17 महीने) ऑर्डर!</b>\n\n👤 यूजर: {userName} (@{username})\n🆔 टेलीग्राम ID: {telegramId}\n\n⏳ कृपया एडमिन पैनल से यूजर को Gmail + पासवर्ड भेजें।",
   },
 };
 
@@ -894,8 +899,43 @@ serve(async (req) => {
         });
       }
 
-      // Handle /chatgpt_17_month command
+      // Handle /chatgpt_17_month command - show confirmation
       if (command === 'chatgpt_17_month') {
+        const userBalance = currentUser?.balance || 0;
+
+        // Check if user has enough balance (6 credits)
+        if (userBalance < 6) {
+          await sendTelegramMessage(chatId, t('chatgptInsufficientBalance', userLang, { balance: userBalance }));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Check if user already has a pending request
+        const { data: pendingRequest } = await supabase
+          .from('chatgpt_orders')
+          .select('id')
+          .eq('telegram_user_id', telegramUser.id)
+          .eq('status', 'pending')
+          .maybeSingle();
+
+        if (pendingRequest) {
+          await sendTelegramMessage(chatId, t('chatgptRequestPending', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Show confirmation message (don't deduct credits yet)
+        await sendTelegramMessage(chatId, t('chatgptConfirmation', userLang, { balance: userBalance }));
+
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Handle /confirm_chatgpt command - actually process the order
+      if (command === 'confirm_chatgpt') {
         const userBalance = currentUser?.balance || 0;
 
         // Check if user has enough balance (6 credits)

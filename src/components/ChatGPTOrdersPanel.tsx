@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronDown, ChevronUp, Check, X, Send, MessageSquare } from "lucide-react";
+import { ChevronDown, ChevronUp, Check, X, Send, MessageSquare, Volume2, VolumeX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { useNotificationSound } from "@/hooks/useNotificationSound";
 
 interface ChatGPTOrder {
   id: string;
@@ -42,6 +43,10 @@ export function ChatGPTOrdersPanel() {
   const [password, setPassword] = useState("");
   const [adminMessage, setAdminMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const { playNotification, stopNotification } = useNotificationSound();
+  const previousPendingCountRef = useRef<number>(0);
+  const isFirstLoadRef = useRef<boolean>(true);
 
   useEffect(() => {
     fetchOrders();
@@ -49,7 +54,21 @@ export function ChatGPTOrdersPanel() {
     const channel = supabase
       .channel('chatgpt-orders-changes')
       .on('postgres_changes', {
-        event: '*',
+        event: 'INSERT',
+        schema: 'public',
+        table: 'chatgpt_orders'
+      }, (payload) => {
+        // New order inserted - play sound for 30 seconds
+        if (payload.new && (payload.new as any).status === 'pending') {
+          setIsPlaying(true);
+          playNotification(30);
+          setTimeout(() => setIsPlaying(false), 30000);
+          toast.info("🔔 নতুন ChatGPT অর্ডার এসেছে!");
+        }
+        fetchOrders();
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
         schema: 'public',
         table: 'chatgpt_orders'
       }, () => {
@@ -59,6 +78,7 @@ export function ChatGPTOrdersPanel() {
 
     return () => {
       supabase.removeChannel(channel);
+      stopNotification();
     };
   }, []);
 
@@ -212,6 +232,21 @@ export function ChatGPTOrdersPanel() {
               <CardTitle className="text-lg">ChatGPT Plus Orders</CardTitle>
               {pendingOrders.length > 0 && (
                 <Badge variant="destructive">{pendingOrders.length} pending</Badge>
+              )}
+              {isPlaying && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    stopNotification();
+                    setIsPlaying(false);
+                  }}
+                  className="h-7 px-2"
+                >
+                  <VolumeX className="h-4 w-4 mr-1" />
+                  Stop
+                </Button>
               )}
             </div>
             {isExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
