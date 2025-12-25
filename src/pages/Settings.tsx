@@ -1,6 +1,6 @@
 import { Sidebar } from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, Bell, Shield, Database, Save, Loader2, Eye, EyeOff, CheckCircle2, XCircle } from 'lucide-react';
+import { MessageCircle, Bell, Shield, Database, Save, Loader2, Eye, EyeOff, CheckCircle2, XCircle, Power } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useBotSettings } from '@/hooks/useBotSettings';
@@ -11,6 +11,8 @@ const Settings = () => {
   const [botToken, setBotToken] = useState('');
   const [showToken, setShowToken] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [botActive, setBotActive] = useState(true);
+  const [togglingBot, setTogglingBot] = useState(false);
   const [webhookStatus, setWebhookStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [botUsername, setBotUsername] = useState<string | null>(null);
   const [notifications, setNotifications] = useState({
@@ -19,13 +21,30 @@ const Settings = () => {
     cancelled: true,
   });
 
-  // Load bot token from settings when available
+  // Load bot token and status from settings when available
   useEffect(() => {
     const token = getSetting('telegram_bot_token');
     if (token) {
       setBotToken(token);
     }
+    const activeStatus = getSetting('bot_active');
+    setBotActive(activeStatus !== 'false');
   }, [settings, getSetting]);
+
+  const handleToggleBotStatus = async () => {
+    setTogglingBot(true);
+    try {
+      const newStatus = !botActive;
+      await updateSetting('bot_active', newStatus ? 'true' : 'false');
+      setBotActive(newStatus);
+      toast.success(newStatus ? 'বট চালু করা হয়েছে' : 'বট বন্ধ করা হয়েছে');
+    } catch (error) {
+      console.error('Error toggling bot status:', error);
+      toast.error('বট স্ট্যাটাস পরিবর্তন করতে সমস্যা হয়েছে');
+    } finally {
+      setTogglingBot(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!botToken.trim()) {
@@ -106,6 +125,38 @@ const Settings = () => {
             </div>
 
             <div className="space-y-4">
+              {/* Bot Status Toggle */}
+              <div className="flex items-center justify-between py-3 px-4 rounded-lg bg-muted/50 border border-border">
+                <div className="flex items-center gap-3">
+                  <Power className={`h-5 w-5 ${botActive ? 'text-green-500' : 'text-red-500'}`} />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      বট স্ট্যাটাস
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {botActive ? 'বট চালু আছে এবং মেসেজ রিসিভ করছে' : 'বট বন্ধ আছে, কোন মেসেজ প্রসেস হবে না'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleToggleBotStatus}
+                  disabled={togglingBot}
+                  className={`relative h-7 w-14 rounded-full transition-colors ${
+                    botActive ? 'bg-green-500' : 'bg-muted'
+                  } disabled:opacity-50`}
+                >
+                  {togglingBot ? (
+                    <Loader2 className="absolute top-1.5 left-1/2 -translate-x-1/2 h-4 w-4 animate-spin text-foreground" />
+                  ) : (
+                    <span
+                      className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                        botActive ? 'left-8' : 'left-1'
+                      }`}
+                    />
+                  )}
+                </button>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
                   Bot Token
