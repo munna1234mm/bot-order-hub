@@ -252,9 +252,9 @@ const translations: Record<string, Record<Language, string>> = {
     hi: "🤖 <b>ChatGPT Plus (17 महीने) सर्विस</b>\n\n💰 लागत: <b>6 क्रेडिट</b>\n📅 अवधि: <b>17 महीने</b>\n💰 आपका बैलेंस: <b>{balance} क्रेडिट</b>\n\n⚠️ <b>आपके अकाउंट से 6 क्रेडिट काटे जाएंगे!</b>\n\n✅ ऑर्डर कन्फर्म करने के लिए भेजें:\n/confirm_chatgpt",
   },
   chatgptAskWait: {
-    en: "🤖 <b>ChatGPT Plus (17 Month) Request</b>\n\n✅ Your order has been confirmed!\n💰 6 credits have been deducted.\n\n⏳ Please wait for admin to send your account details (Gmail + Password).",
-    bn: "🤖 <b>ChatGPT Plus (১৭ মাস) রিকোয়েস্ট</b>\n\n✅ আপনার অর্ডার নিশ্চিত হয়েছে!\n💰 ৬ ক্রেডিট কেটে নেওয়া হয়েছে।\n\n⏳ অ্যাডমিন আপনাকে অ্যাকাউন্টের তথ্য (জিমেইল + পাসওয়ার্ড) পাঠাবে, অনুগ্রহ করে অপেক্ষা করুন।",
-    hi: "🤖 <b>ChatGPT Plus (17 महीने) रिक्वेस्ट</b>\n\n✅ आपका ऑर्डर कन्फर्म हो गया!\n💰 6 क्रेडिट काटे गए।\n\n⏳ कृपया एडमिन द्वारा अकाउंट डिटेल्स (Gmail + पासवर्ड) भेजने का इंतजार करें।",
+    en: "✅ <b>Order Confirmed!</b>\n\n⏳ Your account will be ready soon. Please wait.",
+    bn: "✅ <b>অর্ডার নিশ্চিত হয়েছে!</b>\n\n⏳ আপনার একাউন্ট রেডি হতে কিছু সময় লাগবে। অনুগ্রহ করে অপেক্ষা করুন।",
+    hi: "✅ <b>ऑर्डर कन्फर्म हुआ!</b>\n\n⏳ आपका अकाउंट जल्द तैयार होगा। कृपया प्रतीक्षा करें।",
   },
   chatgptInsufficientBalance: {
     en: "❌ <b>Insufficient Balance!</b>\n\n💰 Your balance: <b>{balance} credits</b>\n📌 Required: <b>6 credits</b>\n\nPlease deposit more credits first using /deposit",
