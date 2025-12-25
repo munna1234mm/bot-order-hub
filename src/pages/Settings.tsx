@@ -23,13 +23,15 @@ const Settings = () => {
 
   // Load bot token and status from settings when available
   useEffect(() => {
-    const token = getSetting('telegram_bot_token');
-    if (token) {
-      setBotToken(token);
+    if (!loading && settings.length > 0) {
+      const token = getSetting('telegram_bot_token');
+      if (token) {
+        setBotToken(token);
+      }
+      const activeStatus = getSetting('bot_active');
+      setBotActive(activeStatus !== 'false');
     }
-    const activeStatus = getSetting('bot_active');
-    setBotActive(activeStatus !== 'false');
-  }, [settings, getSetting]);
+  }, [loading, settings, getSetting]);
 
   const handleToggleBotStatus = async () => {
     setTogglingBot(true);
