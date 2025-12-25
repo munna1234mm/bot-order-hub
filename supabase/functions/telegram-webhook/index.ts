@@ -34,14 +34,21 @@ async function initBotToken(supabase: any): Promise<void> {
 }
 
 async function isBotActive(supabase: any): Promise<boolean> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('bot_settings')
     .select('value')
     .eq('key', 'bot_active')
-    .single();
+    .maybeSingle();
   
-  // Default to active if not set
-  return data?.value !== 'false';
+  console.log('Bot active check:', { data, error, value: data?.value });
+  
+  // Default to active if not set or error
+  if (error || !data) {
+    console.log('Bot active setting not found, defaulting to active');
+    return true;
+  }
+  
+  return data.value === 'true';
 }
 
 // Multi-language translations
