@@ -295,6 +295,32 @@ const translations: Record<string, Record<Language, string>> = {
     bn: "🔔 <b>নতুন ChatGPT Plus (১৭ মাস) অর্ডার!</b>\n\n👤 ইউজার: {userName} (@{username})\n🆔 টেলিগ্রাম ID: {telegramId}\n\n⏳ অ্যাডমিন প্যানেল থেকে ইউজারকে জিমেইল + পাসওয়ার্ড পাঠান।",
     hi: "🔔 <b>नई ChatGPT Plus (17 महीने) ऑर्डर!</b>\n\n👤 यूजर: {userName} (@{username})\n🆔 टेलीग्राम ID: {telegramId}\n\n⏳ कृपया एडमिन पैनल से यूजर को Gmail + पासवर्ड भेजें।",
   },
+  // ChatGPT Team translations
+  chatgptTeamConfirmation: {
+    en: "🤖 <b>ChatGPT Team Service</b>\n\n💰 Cost: <b>110 credits</b>\n💰 Your balance: <b>{balance} credits</b>\n\n⚠️ <b>110 credits will be deducted from your account!</b>\n\n✅ To confirm your order, send:\n/confirm_chatgpt_team",
+    bn: "🤖 <b>ChatGPT Team সার্ভিস</b>\n\n💰 খরচ: <b>১১০ ক্রেডিট</b>\n💰 আপনার ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n\n⚠️ <b>আপনার একাউন্ট থেকে ১১০ ক্রেডিট কেটে নেওয়া হবে!</b>\n\n✅ অর্ডার নিশ্চিত করতে পাঠান:\n/confirm_chatgpt_team",
+    hi: "🤖 <b>ChatGPT Team सर्विस</b>\n\n💰 लागत: <b>110 क्रेडिट</b>\n💰 आपका बैलेंस: <b>{balance} क्रेडिट</b>\n\n⚠️ <b>आपके अकाउंट से 110 क्रेडिट काटे जाएंगे!</b>\n\n✅ ऑर्डर कन्फर्म करने के लिए भेजें:\n/confirm_chatgpt_team",
+  },
+  chatgptTeamAskWait: {
+    en: "✅ <b>ChatGPT Team Order Confirmed!</b>\n\n⏳ Your account will be ready soon. Please wait for Gmail + Password.",
+    bn: "✅ <b>ChatGPT Team অর্ডার নিশ্চিত হয়েছে!</b>\n\n⏳ আপনার একাউন্ট রেডি হতে কিছু সময় লাগবে। জিমেইল + পাসওয়ার্ডের জন্য অপেক্ষা করুন।",
+    hi: "✅ <b>ChatGPT Team ऑर्डर कन्फर्म हुआ!</b>\n\n⏳ आपका अकाउंट जल्द तैयार होगा। Gmail + पासवर्ड के लिए प्रतीक्षा करें।",
+  },
+  chatgptTeamInsufficientBalance: {
+    en: "❌ <b>Insufficient Balance!</b>\n\n💰 Your balance: <b>{balance} credits</b>\n📌 Required: <b>110 credits</b>\n\nPlease deposit more credits first using /deposit",
+    bn: "❌ <b>পর্যাপ্ত ব্যালেন্স নেই!</b>\n\n💰 আপনার ব্যালেন্স: <b>{balance} ক্রেডিট</b>\n📌 প্রয়োজন: <b>১১০ ক্রেডিট</b>\n\n/deposit ব্যবহার করে আরো ক্রেডিট জমা দিন",
+    hi: "❌ <b>अपर्याप्त बैलेंस!</b>\n\n💰 आपका बैलेंस: <b>{balance} क्रेडिट</b>\n📌 आवश्यक: <b>110 क्रेडिट</b>\n\nकृपया /deposit का उपयोग करके पहले अधिक क्रेडिट जमा करें",
+  },
+  chatgptTeamRequestPending: {
+    en: "⏳ <b>You already have a pending ChatGPT Team request!</b>\n\nPlease wait for admin to process your request.",
+    bn: "⏳ <b>আপনার ইতিমধ্যে একটি ChatGPT Team রিকোয়েস্ট পেন্ডিং আছে!</b>\n\nঅনুগ্রহ করে অ্যাডমিনের প্রসেসের জন্য অপেক্ষা করুন।",
+    hi: "⏳ <b>आपकी पहले से एक ChatGPT Team रिक्वेस्ट पेंडिंग है!</b>\n\nकृपया एडमिन द्वारा प्रोसेसिंग का इंतजार करें।",
+  },
+  chatgptTeamAdminNotification: {
+    en: "🔔 <b>New ChatGPT Team Order!</b>\n\n👤 User: {userName} (@{username})\n🆔 Telegram ID: {telegramId}\n\n💰 110 credits deducted\n\n⏳ Please send Gmail + Password to user.",
+    bn: "🔔 <b>নতুন ChatGPT Team অর্ডার!</b>\n\n👤 ইউজার: {userName} (@{username})\n🆔 টেলিগ্রাম ID: {telegramId}\n\n💰 ১১০ ক্রেডিট কাটা হয়েছে\n\n⏳ ইউজারকে জিমেইল + পাসওয়ার্ড পাঠান।",
+    hi: "🔔 <b>नई ChatGPT Team ऑर्डर!</b>\n\n👤 यूजर: {userName} (@{username})\n🆔 टेलीग्राम ID: {telegramId}\n\n💰 110 क्रेडिट काटे गए\n\n⏳ कृपया यूजर को Gmail + पासवर्ड भेजें।",
+  },
 };
 
 function t(key: string, lang: Language, replacements: Record<string, string | number> = {}): string {
@@ -1043,6 +1069,132 @@ serve(async (req) => {
 
         // Tell user to wait
         await sendTelegramMessage(chatId, t('chatgptAskWait', userLang));
+
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Handle /chatgpt_team command - show confirmation
+      if (command === 'chatgpt_team') {
+        const userBalance = currentUser?.balance || 0;
+
+        // Check if user has enough balance (110 credits)
+        if (userBalance < 110) {
+          await sendTelegramMessage(chatId, t('chatgptTeamInsufficientBalance', userLang, { balance: userBalance }));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Check if user already has a pending ChatGPT Team request
+        const { data: pendingRequest } = await supabase
+          .from('chatgpt_orders')
+          .select('id')
+          .eq('telegram_user_id', telegramUser.id)
+          .eq('status', 'pending')
+          .eq('order_type', 'chatgpt_team')
+          .maybeSingle();
+
+        if (pendingRequest) {
+          await sendTelegramMessage(chatId, t('chatgptTeamRequestPending', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Show confirmation message (don't deduct credits yet)
+        await sendTelegramMessage(chatId, t('chatgptTeamConfirmation', userLang, { balance: userBalance }));
+
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Handle /confirm_chatgpt_team command - actually process the order
+      if (command === 'confirm_chatgpt_team') {
+        const userBalance = currentUser?.balance || 0;
+
+        // Check if user has enough balance (110 credits)
+        if (userBalance < 110) {
+          await sendTelegramMessage(chatId, t('chatgptTeamInsufficientBalance', userLang, { balance: userBalance }));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Check if user already has a pending ChatGPT Team request
+        const { data: pendingRequest } = await supabase
+          .from('chatgpt_orders')
+          .select('id')
+          .eq('telegram_user_id', telegramUser.id)
+          .eq('status', 'pending')
+          .eq('order_type', 'chatgpt_team')
+          .maybeSingle();
+
+        if (pendingRequest) {
+          await sendTelegramMessage(chatId, t('chatgptTeamRequestPending', userLang));
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Deduct 110 credits
+        const newBalance = userBalance - 110;
+        await supabase
+          .from('telegram_users')
+          .update({ balance: newBalance })
+          .eq('telegram_id', telegramUser.id);
+
+        // Create ChatGPT Team order
+        const { error: orderError } = await supabase
+          .from('chatgpt_orders')
+          .insert({
+            telegram_user_id: telegramUser.id,
+            status: 'pending',
+            order_type: 'chatgpt_team',
+            credits_cost: 110
+          });
+
+        if (orderError) {
+          console.error('ChatGPT Team order error:', orderError);
+          // Refund credits if order creation failed
+          await supabase
+            .from('telegram_users')
+            .update({ balance: userBalance })
+            .eq('telegram_id', telegramUser.id);
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Notify admins via user bot
+        const { data: adminIds } = await supabase
+          .from('admin_telegram_ids')
+          .select('telegram_chat_id')
+          .eq('is_active', true);
+
+        const userName = telegramUser.first_name || 'Unknown';
+        const username = telegramUser.username || 'no_username';
+
+        if (adminIds && adminIds.length > 0) {
+          for (const admin of adminIds) {
+            const adminChatId = Number(admin.telegram_chat_id);
+            if (adminChatId === chatId) continue;
+
+            await sendTelegramMessage(adminChatId, t('chatgptTeamAdminNotification', 'en', {
+              userName,
+              username,
+              telegramId: telegramUser.id,
+            }));
+          }
+        }
+
+        // Send notification to Admin Bot
+        await sendAdminBotNotification(`🔔 <b>নতুন ChatGPT Team অর্ডার!</b>\n\n👤 ইউজার: ${userName} (@${username})\n🆔 টেলিগ্রাম ID: ${telegramUser.id}\n\n💰 ১১০ ক্রেডিট কেটে নেওয়া হয়েছে\n\n⏳ /orders দিয়ে Gmail + Password পাঠান`);
+
+        // Tell user to wait
+        await sendTelegramMessage(chatId, t('chatgptTeamAskWait', userLang));
 
         return new Response(JSON.stringify({ ok: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
