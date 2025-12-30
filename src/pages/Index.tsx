@@ -14,6 +14,7 @@ import { ReferralBonusPanel } from '@/components/ReferralBonusPanel';
 import { BroadcastMessagePanel } from '@/components/BroadcastMessagePanel';
 import { ChatGPTOrdersPanel } from '@/components/ChatGPTOrdersPanel';
 import { ProductsPanel } from '@/components/ProductsPanel';
+import { OrdersOverviewPanel } from '@/components/OrdersOverviewPanel';
 import { useTelegramUsers } from '@/hooks/useTelegramUsers';
 import { useTelegramMessages } from '@/hooks/useTelegramMessages';
 import { useOrderStats } from '@/hooks/useOrderStats';
@@ -82,6 +83,11 @@ const Index = () => {
             icon={Clock}
             variant="primary"
           />
+        </div>
+
+        {/* All Orders Overview Panel */}
+        <div className="mb-6">
+          <OrdersOverviewPanel />
         </div>
 
         {/* Deposits Panel */}
