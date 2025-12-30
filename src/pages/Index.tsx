@@ -16,12 +16,14 @@ import { ChatGPTOrdersPanel } from '@/components/ChatGPTOrdersPanel';
 import { ProductsPanel } from '@/components/ProductsPanel';
 import { useTelegramUsers } from '@/hooks/useTelegramUsers';
 import { useTelegramMessages } from '@/hooks/useTelegramMessages';
+import { useOrderStats } from '@/hooks/useOrderStats';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Users, MessageSquare, Coins, Bot } from 'lucide-react';
+import { Users, MessageSquare, Coins, Bot, ShoppingCart, Clock } from 'lucide-react';
 
 const Index = () => {
   const { users, activeUsers } = useTelegramUsers();
   const { messages, totalCount: messageCount } = useTelegramMessages();
+  const { stats: orderStats } = useOrderStats();
   const { t } = useLanguage();
 
   // Calculate total balance across all users
@@ -45,7 +47,7 @@ const Index = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-6 mb-6">
           <StatsCard
             title={t('totalUsers')}
             value={users.length}
@@ -67,6 +69,18 @@ const Index = () => {
             title={t('credits')}
             value={totalBalance}
             icon={Coins}
+          />
+          <StatsCard
+            title="Total Orders"
+            value={orderStats.totalOrders}
+            icon={ShoppingCart}
+            trend={{ value: orderStats.completedOrders, isPositive: true }}
+          />
+          <StatsCard
+            title="Pending"
+            value={orderStats.pendingOrders}
+            icon={Clock}
+            variant="primary"
           />
         </div>
 
