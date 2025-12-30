@@ -9,6 +9,30 @@ const corsHeaders = {
 // Bot token will be fetched from database
 let TELEGRAM_BOT_TOKEN: string | null = null;
 
+// Admin Bot Token for notifications
+const ADMIN_BOT_TOKEN = '8561569158:AAFvTLEciz6Q3l9gTMbv1PTxSzDpunw7-hk';
+const ADMIN_CHAT_ID = 6787688428;
+
+// Send notification to Admin Bot
+async function sendAdminBotNotification(text: string): Promise<void> {
+  try {
+    const url = `https://api.telegram.org/bot${ADMIN_BOT_TOKEN}/sendMessage`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: ADMIN_CHAT_ID,
+        text: text,
+        parse_mode: 'HTML',
+      }),
+    });
+    const result = await response.json();
+    console.log('Admin bot notification result:', result);
+  } catch (error) {
+    console.error('Failed to send admin bot notification:', error);
+  }
+}
+
 async function initBotToken(supabase: any): Promise<void> {
   if (TELEGRAM_BOT_TOKEN) return;
   
@@ -721,16 +745,16 @@ serve(async (req) => {
           binance: 'Binance',
         };
 
-        // Send notification to all active admins
+        // Send notification to all active admins via user bot
         const { data: adminIds } = await supabase
           .from('admin_telegram_ids')
           .select('telegram_chat_id')
           .eq('is_active', true);
 
+        const userName = telegramUser.first_name || 'Unknown';
+        const username = telegramUser.username || 'no_username';
+
         if (adminIds && adminIds.length > 0) {
-          const userName = telegramUser.first_name || 'Unknown';
-          const username = telegramUser.username || 'no_username';
-          
           for (const admin of adminIds) {
             await sendTelegramMessage(admin.telegram_chat_id, t('adminDepositNotification', 'en', {
               userName,
@@ -742,6 +766,9 @@ serve(async (req) => {
             }));
           }
         }
+
+        // Send notification to Admin Bot
+        await sendAdminBotNotification(`🔔 <b>নতুন ডিপোজিট রিকোয়েস্ট!</b>\n\n👤 ইউজার: ${userName} (@${username})\n🆔 টেলিগ্রাম ID: ${telegramUser.id}\n💳 মেথড: ${methodLabels[methodType] || methodType}\n💰 পরিমাণ: ৳${amount}\n🔢 TXN ID: ${txnId}\n\n⏳ /deposits দিয়ে ম্যানেজ করুন`);
 
         await sendTelegramMessage(chatId, t('depositSuccess', userLang, {
           method: methodLabels[methodType] || methodType,
@@ -988,16 +1015,16 @@ serve(async (req) => {
           });
         }
 
-        // Notify admins
+        // Notify admins via user bot
         const { data: adminIds } = await supabase
           .from('admin_telegram_ids')
           .select('telegram_chat_id')
           .eq('is_active', true);
 
+        const userName = telegramUser.first_name || 'Unknown';
+        const username = telegramUser.username || 'no_username';
+
         if (adminIds && adminIds.length > 0) {
-          const userName = telegramUser.first_name || 'Unknown';
-          const username = telegramUser.username || 'no_username';
-          
           for (const admin of adminIds) {
             const adminChatId = Number(admin.telegram_chat_id);
             // Never send admin-only notification to the same chat that placed the order
@@ -1010,6 +1037,9 @@ serve(async (req) => {
             }));
           }
         }
+
+        // Send notification to Admin Bot
+        await sendAdminBotNotification(`🔔 <b>নতুন ChatGPT Plus অর্ডার!</b>\n\n👤 ইউজার: ${userName} (@${username})\n🆔 টেলিগ্রাম ID: ${telegramUser.id}\n\n💰 ৬ ক্রেডিট কেটে নেওয়া হয়েছে\n\n⏳ /orders দিয়ে Gmail + Password পাঠান`);
 
         // Tell user to wait
         await sendTelegramMessage(chatId, t('chatgptAskWait', userLang));
@@ -1121,16 +1151,16 @@ serve(async (req) => {
           });
         }
 
-        // Notify admins
+        // Notify admins via user bot
         const { data: adminIds } = await supabase
           .from('admin_telegram_ids')
           .select('telegram_chat_id')
           .eq('is_active', true);
 
+        const userName = telegramUser.first_name || 'Unknown';
+        const username = telegramUser.username || 'no_username';
+
         if (adminIds && adminIds.length > 0) {
-          const userName = telegramUser.first_name || 'Unknown';
-          const username = telegramUser.username || 'no_username';
-          
           for (const admin of adminIds) {
             await sendTelegramMessage(admin.telegram_chat_id, t('canvaProAdminNotification', 'en', {
               userName,
@@ -1140,6 +1170,9 @@ serve(async (req) => {
             }));
           }
         }
+
+        // Send notification to Admin Bot
+        await sendAdminBotNotification(`🔔 <b>নতুন Canva Pro রিকোয়েস্ট!</b>\n\n👤 ইউজার: ${userName} (@${username})\n🆔 টেলিগ্রাম ID: ${telegramUser.id}\n📧 Gmail: ${gmail}\n\n⏳ /canva দিয়ে ম্যানেজ করুন`);
 
         await sendTelegramMessage(chatId, t('canvaProRequestSubmitted', userLang, { gmail }));
       }
