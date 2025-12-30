@@ -34,7 +34,6 @@ async function sendTelegramMessage(chatId: number, text: string, replyMarkup?: a
 }
 
 async function sendToUser(telegramUserId: number, text: string): Promise<boolean> {
-  // Get user bot token from database
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const supabase = createClient(supabaseUrl, supabaseKey);
@@ -95,146 +94,136 @@ serve(async (req) => {
       const chatId = callbackQuery.message.chat.id;
       const data = callbackQuery.data;
       
-      // Check admin
       if (chatId !== ADMIN_CHAT_ID) {
-        await sendTelegramMessage(chatId, '❌ You are not authorized to use this bot.');
+        await sendTelegramMessage(chatId, '❌ You are not authorized.');
         return new Response('OK', { headers: corsHeaders });
       }
 
       console.log('Callback data:', data);
 
-      // Handle order actions
+      // ChatGPT Order Actions
       if (data.startsWith('approve_chatgpt_')) {
         const orderId = data.replace('approve_chatgpt_', '');
-        await sendTelegramMessage(chatId, `📝 Send credentials for order ${orderId.slice(0, 8)}...\n\nUse: /send_gpt ${orderId} gmail@example.com password123`);
-      } else if (data.startsWith('reject_chatgpt_')) {
+        await sendTelegramMessage(chatId, `📝 Send credentials:\n\n/send_gpt ${orderId} gmail@example.com password123`);
+      } 
+      else if (data.startsWith('reject_chatgpt_')) {
         const orderId = data.replace('reject_chatgpt_', '');
-        
-        // Get order info
-        const { data: order } = await supabase
-          .from('chatgpt_orders')
-          .select('telegram_user_id')
-          .eq('id', orderId)
-          .single();
+        const { data: order } = await supabase.from('chatgpt_orders').select('telegram_user_id').eq('id', orderId).single();
         
         if (order) {
-          // Update order status
-          await supabase
-            .from('chatgpt_orders')
-            .update({ status: 'rejected', processed_at: new Date().toISOString() })
-            .eq('id', orderId);
-          
-          // Refund credits
-          await supabase.rpc('increment_balance', { user_telegram_id: order.telegram_user_id, amount: 12 });
-          
-          // Notify user
-          await sendToUser(order.telegram_user_id, '❌ Your ChatGPT order has been rejected. 12 credits have been refunded.');
-          
-          await sendTelegramMessage(chatId, '✅ Order rejected and 12 credits refunded.');
-        }
-      } else if (data.startsWith('approve_canva_')) {
-        const requestId = data.replace('approve_canva_', '');
-        
-        const { data: request } = await supabase
-          .from('canva_pro_requests')
-          .select('telegram_user_id, gmail')
-          .eq('id', requestId)
-          .single();
-        
-        if (request) {
-          await supabase
-            .from('canva_pro_requests')
-            .update({ status: 'approved', processed_at: new Date().toISOString() })
-            .eq('id', requestId);
-          
-          // Deduct credits
-          const { data: user } = await supabase
-            .from('telegram_users')
-            .select('balance')
-            .eq('telegram_id', request.telegram_user_id)
-            .single();
-          
-          if (user && user.balance >= 5) {
-            await supabase
-              .from('telegram_users')
-              .update({ balance: user.balance - 5 })
-              .eq('telegram_id', request.telegram_user_id);
-          }
-          
-          await sendToUser(request.telegram_user_id, '✅ Your Canva Pro account has been created! Please check your email inbox.');
-          await sendTelegramMessage(chatId, `✅ Canva Pro approved for ${request.gmail}`);
-        }
-      } else if (data.startsWith('reject_canva_')) {
-        const requestId = data.replace('reject_canva_', '');
-        
-        const { data: request } = await supabase
-          .from('canva_pro_requests')
-          .select('telegram_user_id')
-          .eq('id', requestId)
-          .single();
-        
-        if (request) {
-          await supabase
-            .from('canva_pro_requests')
-            .update({ status: 'rejected', processed_at: new Date().toISOString() })
-            .eq('id', requestId);
-          
-          await sendToUser(request.telegram_user_id, '❌ Your Canva Pro request has been rejected.');
-          await sendTelegramMessage(chatId, '✅ Canva Pro request rejected.');
-        }
-      } else if (data.startsWith('approve_deposit_')) {
-        const depositId = data.replace('approve_deposit_', '');
-        
-        const { data: deposit } = await supabase
-          .from('deposits')
-          .select('telegram_user_id, amount')
-          .eq('id', depositId)
-          .single();
-        
-        if (deposit) {
-          await supabase
-            .from('deposits')
-            .update({ status: 'approved', processed_at: new Date().toISOString() })
-            .eq('id', depositId);
-          
-          // Add credits to user
-          const { data: user } = await supabase
-            .from('telegram_users')
-            .select('balance')
-            .eq('telegram_id', deposit.telegram_user_id)
-            .single();
-          
+          await supabase.from('chatgpt_orders').update({ status: 'rejected', processed_at: new Date().toISOString() }).eq('id', orderId);
+          const { data: user } = await supabase.from('telegram_users').select('balance').eq('telegram_id', order.telegram_user_id).single();
           if (user) {
-            await supabase
-              .from('telegram_users')
-              .update({ balance: user.balance + deposit.amount })
-              .eq('telegram_id', deposit.telegram_user_id);
+            await supabase.from('telegram_users').update({ balance: user.balance + 12 }).eq('telegram_id', order.telegram_user_id);
           }
-          
-          await sendToUser(deposit.telegram_user_id, `✅ Your deposit of ৳${deposit.amount} has been approved! Credits added to your account.`);
-          await sendTelegramMessage(chatId, `✅ Deposit of ৳${deposit.amount} approved.`);
-        }
-      } else if (data.startsWith('reject_deposit_')) {
-        const depositId = data.replace('reject_deposit_', '');
-        
-        const { data: deposit } = await supabase
-          .from('deposits')
-          .select('telegram_user_id, amount')
-          .eq('id', depositId)
-          .single();
-        
-        if (deposit) {
-          await supabase
-            .from('deposits')
-            .update({ status: 'rejected', processed_at: new Date().toISOString() })
-            .eq('id', depositId);
-          
-          await sendToUser(deposit.telegram_user_id, `❌ Your deposit request of ৳${deposit.amount} has been rejected.`);
-          await sendTelegramMessage(chatId, `✅ Deposit rejected.`);
+          await sendToUser(order.telegram_user_id, '❌ Your ChatGPT order was rejected. 12 credits refunded.');
+          await sendTelegramMessage(chatId, '✅ Order rejected, 12 credits refunded.');
         }
       }
+      // Canva Pro Actions
+      else if (data.startsWith('approve_canva_')) {
+        const requestId = data.replace('approve_canva_', '');
+        const { data: request } = await supabase.from('canva_pro_requests').select('telegram_user_id, gmail').eq('id', requestId).single();
+        
+        if (request) {
+          await supabase.from('canva_pro_requests').update({ status: 'approved', processed_at: new Date().toISOString() }).eq('id', requestId);
+          const { data: user } = await supabase.from('telegram_users').select('balance').eq('telegram_id', request.telegram_user_id).single();
+          if (user && user.balance >= 5) {
+            await supabase.from('telegram_users').update({ balance: user.balance - 5 }).eq('telegram_id', request.telegram_user_id);
+          }
+          await sendToUser(request.telegram_user_id, '✅ Your Canva Pro account is ready! Check your email.');
+          await sendTelegramMessage(chatId, `✅ Canva Pro approved for ${request.gmail}`);
+        }
+      }
+      else if (data.startsWith('reject_canva_')) {
+        const requestId = data.replace('reject_canva_', '');
+        const { data: request } = await supabase.from('canva_pro_requests').select('telegram_user_id').eq('id', requestId).single();
+        
+        if (request) {
+          await supabase.from('canva_pro_requests').update({ status: 'rejected', processed_at: new Date().toISOString() }).eq('id', requestId);
+          await sendToUser(request.telegram_user_id, '❌ Your Canva Pro request was rejected.');
+          await sendTelegramMessage(chatId, '✅ Canva Pro request rejected.');
+        }
+      }
+      // Deposit Actions
+      else if (data.startsWith('approve_deposit_')) {
+        const depositId = data.replace('approve_deposit_', '');
+        const { data: deposit } = await supabase.from('deposits').select('telegram_user_id, amount').eq('id', depositId).single();
+        
+        if (deposit) {
+          await supabase.from('deposits').update({ status: 'approved', processed_at: new Date().toISOString() }).eq('id', depositId);
+          const { data: user } = await supabase.from('telegram_users').select('balance').eq('telegram_id', deposit.telegram_user_id).single();
+          if (user) {
+            await supabase.from('telegram_users').update({ balance: user.balance + deposit.amount }).eq('telegram_id', deposit.telegram_user_id);
+          }
+          await sendToUser(deposit.telegram_user_id, `✅ Deposit of ৳${deposit.amount} approved! Credits added.`);
+          await sendTelegramMessage(chatId, `✅ Deposit ৳${deposit.amount} approved.`);
+        }
+      }
+      else if (data.startsWith('reject_deposit_')) {
+        const depositId = data.replace('reject_deposit_', '');
+        const { data: deposit } = await supabase.from('deposits').select('telegram_user_id, amount').eq('id', depositId).single();
+        
+        if (deposit) {
+          await supabase.from('deposits').update({ status: 'rejected', processed_at: new Date().toISOString() }).eq('id', depositId);
+          await sendToUser(deposit.telegram_user_id, `❌ Deposit request of ৳${deposit.amount} was rejected.`);
+          await sendTelegramMessage(chatId, '✅ Deposit rejected.');
+        }
+      }
+      // Ban/Unban Actions
+      else if (data.startsWith('ban_user_')) {
+        const tgId = parseInt(data.replace('ban_user_', ''));
+        await supabase.from('telegram_users').update({ is_banned: true, banned_at: new Date().toISOString() }).eq('telegram_id', tgId);
+        await sendTelegramMessage(chatId, `🚫 User ${tgId} banned.`);
+      }
+      else if (data.startsWith('unban_user_')) {
+        const tgId = parseInt(data.replace('unban_user_', ''));
+        await supabase.from('telegram_users').update({ is_banned: false, banned_at: null }).eq('telegram_id', tgId);
+        await sendTelegramMessage(chatId, `✅ User ${tgId} unbanned.`);
+      }
+      // Coupon Actions
+      else if (data.startsWith('toggle_coupon_')) {
+        const couponId = data.replace('toggle_coupon_', '');
+        const { data: coupon } = await supabase.from('coupon_codes').select('is_active').eq('id', couponId).single();
+        if (coupon) {
+          await supabase.from('coupon_codes').update({ is_active: !coupon.is_active }).eq('id', couponId);
+          await sendTelegramMessage(chatId, `✅ Coupon ${coupon.is_active ? 'deactivated' : 'activated'}.`);
+        }
+      }
+      else if (data.startsWith('delete_coupon_')) {
+        const couponId = data.replace('delete_coupon_', '');
+        await supabase.from('coupon_codes').delete().eq('id', couponId);
+        await sendTelegramMessage(chatId, '✅ Coupon deleted.');
+      }
+      // Command Actions
+      else if (data.startsWith('toggle_cmd_')) {
+        const cmdId = data.replace('toggle_cmd_', '');
+        const { data: cmd } = await supabase.from('bot_commands').select('is_active').eq('id', cmdId).single();
+        if (cmd) {
+          await supabase.from('bot_commands').update({ is_active: !cmd.is_active }).eq('id', cmdId);
+          await sendTelegramMessage(chatId, `✅ Command ${cmd.is_active ? 'disabled' : 'enabled'}.`);
+        }
+      }
+      else if (data.startsWith('delete_cmd_')) {
+        const cmdId = data.replace('delete_cmd_', '');
+        await supabase.from('bot_commands').delete().eq('id', cmdId);
+        await sendTelegramMessage(chatId, '✅ Command deleted.');
+      }
+      // Payment Method Actions
+      else if (data.startsWith('toggle_pm_')) {
+        const pmId = data.replace('toggle_pm_', '');
+        const { data: pm } = await supabase.from('payment_methods').select('is_active').eq('id', pmId).single();
+        if (pm) {
+          await supabase.from('payment_methods').update({ is_active: !pm.is_active }).eq('id', pmId);
+          await sendTelegramMessage(chatId, `✅ Payment method ${pm.is_active ? 'disabled' : 'enabled'}.`);
+        }
+      }
+      else if (data.startsWith('delete_pm_')) {
+        const pmId = data.replace('delete_pm_', '');
+        await supabase.from('payment_methods').delete().eq('id', pmId);
+        await sendTelegramMessage(chatId, '✅ Payment method deleted.');
+      }
 
-      // Answer callback to remove loading state
       await fetch(`https://api.telegram.org/bot${ADMIN_BOT_TOKEN}/answerCallbackQuery`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -253,202 +242,499 @@ serve(async (req) => {
     
     console.log(`Admin bot message from ${chatId}: ${text}`);
 
-    // Check if admin
     if (chatId !== ADMIN_CHAT_ID) {
       await sendTelegramMessage(chatId, '❌ You are not authorized to use this bot.');
       return new Response('OK', { headers: corsHeaders });
     }
 
-    // Handle commands
-    if (text === '/start') {
-      await sendTelegramMessage(chatId, `🤖 <b>Admin Bot Ready!</b>\n\n<b>Commands:</b>\n/orders - View pending orders\n/deposits - View pending deposits\n/canva - View pending Canva requests\n/stats - View statistics\n/broadcast MESSAGE - Send message to all users\n/send_gpt ORDER_ID GMAIL PASSWORD - Send ChatGPT credentials\n/users - View total users`);
-    }
+    // ========== COMMANDS ==========
     
-    else if (text === '/orders') {
-      const { data: orders } = await supabase
-        .from('chatgpt_orders')
+    if (text === '/start' || text === '/help') {
+      await sendTelegramMessage(chatId, `🤖 <b>Admin Bot - All Commands</b>
+
+📊 <b>Dashboard</b>
+/stats - Statistics overview
+/users - User management
+/messages - Recent messages
+
+📦 <b>Orders</b>
+/orders - Pending ChatGPT orders
+/canva - Pending Canva requests
+/deposits - Pending deposits
+
+💳 <b>Settings</b>
+/coupons - Manage coupons
+/commands - Bot commands
+/payments - Payment methods
+/referral - Referral bonus
+/admins - Admin IDs
+
+📤 <b>Actions</b>
+/broadcast MSG - Broadcast message
+/ban ID - Ban user
+/unban ID - Unban user
+/addcredit ID AMOUNT - Add credits
+/removecredit ID AMOUNT - Remove credits
+/send_gpt ID GMAIL PASS - Send GPT creds
+
+➕ <b>Add New</b>
+/addcoupon CODE CREDITS - Add coupon
+/addcmd /CMD RESPONSE - Add command
+/addpayment NAME TYPE NUMBER - Add payment`);
+    }
+
+    // ========== STATS ==========
+    else if (text === '/stats') {
+      const { count: totalUsers } = await supabase.from('telegram_users').select('*', { count: 'exact', head: true });
+      const { count: activeUsers } = await supabase.from('telegram_users').select('*', { count: 'exact', head: true }).eq('is_banned', false);
+      const { count: pendingOrders } = await supabase.from('chatgpt_orders').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+      const { count: pendingDeposits } = await supabase.from('deposits').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+      const { count: pendingCanva } = await supabase.from('canva_pro_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+      const { count: totalCoupons } = await supabase.from('coupon_codes').select('*', { count: 'exact', head: true }).eq('is_active', true);
+      
+      await sendTelegramMessage(chatId, `📊 <b>Dashboard Statistics</b>
+
+👥 <b>Users</b>
+Total: ${totalUsers || 0}
+Active: ${activeUsers || 0}
+Banned: ${(totalUsers || 0) - (activeUsers || 0)}
+
+⏳ <b>Pending</b>
+ChatGPT Orders: ${pendingOrders || 0}
+Deposits: ${pendingDeposits || 0}
+Canva Requests: ${pendingCanva || 0}
+
+🎫 Active Coupons: ${totalCoupons || 0}`);
+    }
+
+    // ========== USERS ==========
+    else if (text === '/users') {
+      const { data: users } = await supabase
+        .from('telegram_users')
         .select('*')
-        .eq('status', 'pending')
         .order('created_at', { ascending: false })
         .limit(10);
+      
+      if (!users || users.length === 0) {
+        await sendTelegramMessage(chatId, '📭 No users found.');
+      } else {
+        let msg = '👥 <b>Recent Users</b>\n\n';
+        for (const u of users) {
+          const status = u.is_banned ? '🚫' : '✅';
+          msg += `${status} <b>${u.first_name || 'Unknown'}</b> (@${u.username || 'N/A'})\n`;
+          msg += `   ID: <code>${u.telegram_id}</code> | 💰 ${u.balance}\n\n`;
+        }
+        msg += `\n/user TELEGRAM_ID - View user details`;
+        await sendTelegramMessage(chatId, msg);
+      }
+    }
+
+    else if (text.startsWith('/user ')) {
+      const tgId = parseInt(text.replace('/user ', '').trim());
+      if (isNaN(tgId)) {
+        await sendTelegramMessage(chatId, '❌ Invalid Telegram ID.');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      const { data: user } = await supabase.from('telegram_users').select('*').eq('telegram_id', tgId).single();
+      
+      if (!user) {
+        await sendTelegramMessage(chatId, '❌ User not found.');
+      } else {
+        await sendTelegramMessage(chatId, `👤 <b>User Details</b>
+
+📛 Name: ${user.first_name || ''} ${user.last_name || ''}
+👤 Username: @${user.username || 'N/A'}
+🆔 Telegram ID: <code>${user.telegram_id}</code>
+💰 Balance: ${user.balance} credits
+🌐 Language: ${user.language}
+👥 Referrals: ${user.referral_count || 0}
+📅 Joined: ${new Date(user.created_at).toLocaleDateString()}
+🕐 Last Active: ${new Date(user.last_active_at).toLocaleString()}
+${user.is_banned ? '🚫 BANNED' : '✅ Active'}`, {
+          inline_keyboard: [
+            [
+              { text: user.is_banned ? '✅ Unban' : '🚫 Ban', callback_data: user.is_banned ? `unban_user_${tgId}` : `ban_user_${tgId}` }
+            ]
+          ]
+        });
+      }
+    }
+
+    // ========== MESSAGES ==========
+    else if (text === '/messages') {
+      const { data: messages } = await supabase
+        .from('telegram_messages')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(15);
+      
+      if (!messages || messages.length === 0) {
+        await sendTelegramMessage(chatId, '📭 No messages found.');
+      } else {
+        let msg = '💬 <b>Recent Messages</b>\n\n';
+        for (const m of messages) {
+          const { data: user } = await supabase.from('telegram_users').select('first_name, username').eq('telegram_id', m.telegram_user_id).single();
+          const name = user?.first_name || 'Unknown';
+          msg += `<b>${name}</b>: ${m.message_text?.slice(0, 50) || '[no text]'}${m.message_text && m.message_text.length > 50 ? '...' : ''}\n`;
+        }
+        await sendTelegramMessage(chatId, msg);
+      }
+    }
+
+    // ========== ORDERS ==========
+    else if (text === '/orders') {
+      const { data: orders } = await supabase.from('chatgpt_orders').select('*').eq('status', 'pending').order('created_at', { ascending: false }).limit(10);
       
       if (!orders || orders.length === 0) {
         await sendTelegramMessage(chatId, '📭 No pending ChatGPT orders.');
       } else {
         for (const order of orders) {
-          const { data: user } = await supabase
-            .from('telegram_users')
-            .select('first_name, username')
-            .eq('telegram_id', order.telegram_user_id)
-            .single();
-          
-          const userName = user?.first_name || 'Unknown';
-          const username = user?.username || 'N/A';
-          
-          await sendTelegramMessage(
-            chatId,
-            `📦 <b>ChatGPT Order</b>\n\n👤 User: ${userName} (@${username})\n🆔 TG ID: ${order.telegram_user_id}\n📅 Date: ${new Date(order.created_at).toLocaleString()}\n\n🔑 Order ID: <code>${order.id}</code>`,
-            {
-              inline_keyboard: [
-                [
-                  { text: '✅ Approve', callback_data: `approve_chatgpt_${order.id}` },
-                  { text: '❌ Reject', callback_data: `reject_chatgpt_${order.id}` }
-                ]
-              ]
-            }
-          );
+          const { data: user } = await supabase.from('telegram_users').select('first_name, username').eq('telegram_id', order.telegram_user_id).single();
+          await sendTelegramMessage(chatId, `📦 <b>ChatGPT Order</b>
+
+👤 ${user?.first_name || 'Unknown'} (@${user?.username || 'N/A'})
+🆔 TG ID: <code>${order.telegram_user_id}</code>
+📅 ${new Date(order.created_at).toLocaleString()}
+
+🔑 <code>${order.id}</code>`, {
+            inline_keyboard: [[
+              { text: '✅ Approve', callback_data: `approve_chatgpt_${order.id}` },
+              { text: '❌ Reject', callback_data: `reject_chatgpt_${order.id}` }
+            ]]
+          });
         }
       }
     }
-    
+
+    else if (text === '/canva') {
+      const { data: requests } = await supabase.from('canva_pro_requests').select('*').eq('status', 'pending').order('created_at', { ascending: false }).limit(10);
+      
+      if (!requests || requests.length === 0) {
+        await sendTelegramMessage(chatId, '📭 No pending Canva requests.');
+      } else {
+        for (const req of requests) {
+          const { data: user } = await supabase.from('telegram_users').select('first_name, username').eq('telegram_id', req.telegram_user_id).single();
+          await sendTelegramMessage(chatId, `🎨 <b>Canva Pro Request</b>
+
+👤 ${user?.first_name || 'Unknown'} (@${user?.username || 'N/A'})
+📧 Gmail: <code>${req.gmail}</code>
+📅 ${new Date(req.created_at).toLocaleString()}`, {
+            inline_keyboard: [[
+              { text: '✅ Approve', callback_data: `approve_canva_${req.id}` },
+              { text: '❌ Reject', callback_data: `reject_canva_${req.id}` }
+            ]]
+          });
+        }
+      }
+    }
+
     else if (text === '/deposits') {
-      const { data: deposits } = await supabase
-        .from('deposits')
-        .select('*')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false })
-        .limit(10);
+      const { data: deposits } = await supabase.from('deposits').select('*').eq('status', 'pending').order('created_at', { ascending: false }).limit(10);
       
       if (!deposits || deposits.length === 0) {
         await sendTelegramMessage(chatId, '📭 No pending deposits.');
       } else {
-        for (const deposit of deposits) {
-          const { data: user } = await supabase
-            .from('telegram_users')
-            .select('first_name, username')
-            .eq('telegram_id', deposit.telegram_user_id)
-            .single();
-          
-          const userName = user?.first_name || 'Unknown';
-          const username = user?.username || 'N/A';
-          
-          await sendTelegramMessage(
-            chatId,
-            `💰 <b>Deposit Request</b>\n\n👤 User: ${userName} (@${username})\n🆔 TG ID: ${deposit.telegram_user_id}\n💵 Amount: ৳${deposit.amount}\n🔢 TXN: ${deposit.transaction_id}\n📅 Date: ${new Date(deposit.created_at).toLocaleString()}`,
-            {
-              inline_keyboard: [
-                [
-                  { text: '✅ Approve', callback_data: `approve_deposit_${deposit.id}` },
-                  { text: '❌ Reject', callback_data: `reject_deposit_${deposit.id}` }
-                ]
-              ]
-            }
-          );
+        for (const dep of deposits) {
+          const { data: user } = await supabase.from('telegram_users').select('first_name, username').eq('telegram_id', dep.telegram_user_id).single();
+          await sendTelegramMessage(chatId, `💰 <b>Deposit Request</b>
+
+👤 ${user?.first_name || 'Unknown'} (@${user?.username || 'N/A'})
+💵 Amount: ৳${dep.amount}
+🔢 TXN: <code>${dep.transaction_id}</code>
+📅 ${new Date(dep.created_at).toLocaleString()}`, {
+            inline_keyboard: [[
+              { text: '✅ Approve', callback_data: `approve_deposit_${dep.id}` },
+              { text: '❌ Reject', callback_data: `reject_deposit_${dep.id}` }
+            ]]
+          });
         }
       }
     }
-    
-    else if (text === '/canva') {
-      const { data: requests } = await supabase
-        .from('canva_pro_requests')
-        .select('*')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false })
-        .limit(10);
+
+    // ========== COUPONS ==========
+    else if (text === '/coupons') {
+      const { data: coupons } = await supabase.from('coupon_codes').select('*').order('created_at', { ascending: false }).limit(10);
       
-      if (!requests || requests.length === 0) {
-        await sendTelegramMessage(chatId, '📭 No pending Canva Pro requests.');
+      if (!coupons || coupons.length === 0) {
+        await sendTelegramMessage(chatId, '📭 No coupons found.\n\n/addcoupon CODE CREDITS - Add new coupon');
       } else {
-        for (const request of requests) {
-          const { data: user } = await supabase
-            .from('telegram_users')
-            .select('first_name, username')
-            .eq('telegram_id', request.telegram_user_id)
-            .single();
-          
-          const userName = user?.first_name || 'Unknown';
-          const username = user?.username || 'N/A';
-          
-          await sendTelegramMessage(
-            chatId,
-            `🎨 <b>Canva Pro Request</b>\n\n👤 User: ${userName} (@${username})\n🆔 TG ID: ${request.telegram_user_id}\n📧 Gmail: ${request.gmail}\n📅 Date: ${new Date(request.created_at).toLocaleString()}`,
-            {
-              inline_keyboard: [
-                [
-                  { text: '✅ Approve', callback_data: `approve_canva_${request.id}` },
-                  { text: '❌ Reject', callback_data: `reject_canva_${request.id}` }
-                ]
-              ]
-            }
-          );
+        for (const c of coupons) {
+          await sendTelegramMessage(chatId, `🎫 <b>${c.code}</b>
+
+💰 Credits: ${c.credits}
+📊 Uses: ${c.current_uses}/${c.max_uses || '∞'}
+${c.is_active ? '✅ Active' : '❌ Inactive'}`, {
+            inline_keyboard: [[
+              { text: c.is_active ? '❌ Disable' : '✅ Enable', callback_data: `toggle_coupon_${c.id}` },
+              { text: '🗑 Delete', callback_data: `delete_coupon_${c.id}` }
+            ]]
+          });
         }
       }
     }
-    
-    else if (text === '/stats') {
-      const { count: totalUsers } = await supabase
-        .from('telegram_users')
-        .select('*', { count: 'exact', head: true });
-      
-      const { count: pendingOrders } = await supabase
-        .from('chatgpt_orders')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending');
-      
-      const { count: pendingDeposits } = await supabase
-        .from('deposits')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending');
-      
-      const { count: pendingCanva } = await supabase
-        .from('canva_pro_requests')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending');
-      
-      await sendTelegramMessage(chatId, `📊 <b>Statistics</b>\n\n👥 Total Users: ${totalUsers || 0}\n📦 Pending ChatGPT Orders: ${pendingOrders || 0}\n💰 Pending Deposits: ${pendingDeposits || 0}\n🎨 Pending Canva Requests: ${pendingCanva || 0}`);
-    }
-    
-    else if (text === '/users') {
-      const { count: totalUsers } = await supabase
-        .from('telegram_users')
-        .select('*', { count: 'exact', head: true });
-      
-      const { count: activeUsers } = await supabase
-        .from('telegram_users')
-        .select('*', { count: 'exact', head: true })
-        .eq('is_banned', false);
-      
-      await sendTelegramMessage(chatId, `👥 <b>Users</b>\n\n📊 Total: ${totalUsers || 0}\n✅ Active: ${activeUsers || 0}\n🚫 Banned: ${(totalUsers || 0) - (activeUsers || 0)}`);
-    }
-    
-    else if (text.startsWith('/broadcast ')) {
-      const broadcastMsg = text.replace('/broadcast ', '').trim();
-      
-      if (!broadcastMsg) {
-        await sendTelegramMessage(chatId, '❌ Please provide a message.\n\nUsage: /broadcast YOUR_MESSAGE');
+
+    else if (text.startsWith('/addcoupon ')) {
+      const parts = text.replace('/addcoupon ', '').trim().split(' ');
+      if (parts.length < 2) {
+        await sendTelegramMessage(chatId, '❌ Usage: /addcoupon CODE CREDITS [MAX_USES]');
         return new Response('OK', { headers: corsHeaders });
       }
       
-      await sendTelegramMessage(chatId, '📤 Starting broadcast...');
+      const code = parts[0].toUpperCase();
+      const credits = parseInt(parts[1]);
+      const maxUses = parts[2] ? parseInt(parts[2]) : null;
       
-      const { data: users } = await supabase
-        .from('telegram_users')
-        .select('telegram_id')
-        .eq('is_banned', false);
-      
-      if (!users || users.length === 0) {
-        await sendTelegramMessage(chatId, '❌ No users to broadcast to.');
+      if (isNaN(credits)) {
+        await sendTelegramMessage(chatId, '❌ Invalid credits amount.');
         return new Response('OK', { headers: corsHeaders });
       }
       
-      let success = 0;
-      let failed = 0;
+      await supabase.from('coupon_codes').insert({ code, credits, max_uses: maxUses });
+      await sendTelegramMessage(chatId, `✅ Coupon <b>${code}</b> created!\n💰 ${credits} credits\n📊 Max uses: ${maxUses || 'Unlimited'}`);
+    }
+
+    // ========== BOT COMMANDS ==========
+    else if (text === '/commands') {
+      const { data: commands } = await supabase.from('bot_commands').select('*').order('command');
       
-      for (const user of users) {
-        const sent = await sendToUser(user.telegram_id, broadcastMsg);
-        if (sent) success++;
-        else failed++;
-        
-        // Rate limiting
-        await new Promise(r => setTimeout(r, 50));
+      if (!commands || commands.length === 0) {
+        await sendTelegramMessage(chatId, '📭 No commands found.\n\n/addcmd /command Response text');
+      } else {
+        for (const cmd of commands) {
+          await sendTelegramMessage(chatId, `⚡ <b>${cmd.command}</b>
+
+📝 ${cmd.response.slice(0, 100)}${cmd.response.length > 100 ? '...' : ''}
+${cmd.is_active ? '✅ Active' : '❌ Inactive'}`, {
+            inline_keyboard: [[
+              { text: cmd.is_active ? '❌ Disable' : '✅ Enable', callback_data: `toggle_cmd_${cmd.id}` },
+              { text: '🗑 Delete', callback_data: `delete_cmd_${cmd.id}` }
+            ]]
+          });
+        }
+      }
+    }
+
+    else if (text.startsWith('/addcmd ')) {
+      const content = text.replace('/addcmd ', '').trim();
+      const spaceIndex = content.indexOf(' ');
+      if (spaceIndex === -1) {
+        await sendTelegramMessage(chatId, '❌ Usage: /addcmd /command Response text');
+        return new Response('OK', { headers: corsHeaders });
       }
       
-      await sendTelegramMessage(chatId, `✅ <b>Broadcast Complete!</b>\n\n📤 Sent: ${success}\n❌ Failed: ${failed}\n📊 Total: ${users.length}`);
+      const command = content.slice(0, spaceIndex);
+      const response = content.slice(spaceIndex + 1);
+      
+      await supabase.from('bot_commands').insert({ command, response });
+      await sendTelegramMessage(chatId, `✅ Command <b>${command}</b> added!`);
     }
-    
+
+    else if (text.startsWith('/editcmd ')) {
+      const content = text.replace('/editcmd ', '').trim();
+      const spaceIndex = content.indexOf(' ');
+      if (spaceIndex === -1) {
+        await sendTelegramMessage(chatId, '❌ Usage: /editcmd /command New response text');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      const command = content.slice(0, spaceIndex);
+      const response = content.slice(spaceIndex + 1);
+      
+      await supabase.from('bot_commands').update({ response }).eq('command', command);
+      await sendTelegramMessage(chatId, `✅ Command <b>${command}</b> updated!`);
+    }
+
+    // ========== PAYMENT METHODS ==========
+    else if (text === '/payments') {
+      const { data: methods } = await supabase.from('payment_methods').select('*').order('name');
+      
+      if (!methods || methods.length === 0) {
+        await sendTelegramMessage(chatId, '📭 No payment methods.\n\n/addpayment NAME TYPE NUMBER');
+      } else {
+        for (const pm of methods) {
+          await sendTelegramMessage(chatId, `💳 <b>${pm.name}</b>
+
+📱 Type: ${pm.type}
+🔢 Number: <code>${pm.account_number}</code>
+👤 Name: ${pm.account_name || 'N/A'}
+${pm.is_active ? '✅ Active' : '❌ Inactive'}`, {
+            inline_keyboard: [[
+              { text: pm.is_active ? '❌ Disable' : '✅ Enable', callback_data: `toggle_pm_${pm.id}` },
+              { text: '🗑 Delete', callback_data: `delete_pm_${pm.id}` }
+            ]]
+          });
+        }
+      }
+    }
+
+    else if (text.startsWith('/addpayment ')) {
+      const parts = text.replace('/addpayment ', '').trim().split(' ');
+      if (parts.length < 3) {
+        await sendTelegramMessage(chatId, '❌ Usage: /addpayment NAME TYPE NUMBER [ACCOUNT_NAME]');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      const name = parts[0];
+      const type = parts[1];
+      const accountNumber = parts[2];
+      const accountName = parts.slice(3).join(' ') || null;
+      
+      await supabase.from('payment_methods').insert({ name, type, account_number: accountNumber, account_name: accountName });
+      await sendTelegramMessage(chatId, `✅ Payment method <b>${name}</b> added!`);
+    }
+
+    // ========== REFERRAL SETTINGS ==========
+    else if (text === '/referral') {
+      const { data: setting } = await supabase.from('bot_settings').select('value').eq('key', 'referral_bonus_amount').single();
+      const bonus = setting?.value || '1';
+      
+      await sendTelegramMessage(chatId, `🎁 <b>Referral Bonus Settings</b>
+
+💰 Current Bonus: <b>${bonus} credits</b>
+
+To change: /setreferral AMOUNT`);
+    }
+
+    else if (text.startsWith('/setreferral ')) {
+      const amount = text.replace('/setreferral ', '').trim();
+      
+      const { data: existing } = await supabase.from('bot_settings').select('id').eq('key', 'referral_bonus_amount').single();
+      
+      if (existing) {
+        await supabase.from('bot_settings').update({ value: amount }).eq('key', 'referral_bonus_amount');
+      } else {
+        await supabase.from('bot_settings').insert({ key: 'referral_bonus_amount', value: amount });
+      }
+      
+      await sendTelegramMessage(chatId, `✅ Referral bonus set to <b>${amount} credits</b>!`);
+    }
+
+    // ========== ADMIN IDS ==========
+    else if (text === '/admins') {
+      const { data: admins } = await supabase.from('admin_telegram_ids').select('*').order('created_at');
+      
+      if (!admins || admins.length === 0) {
+        await sendTelegramMessage(chatId, '📭 No admin IDs configured.\n\n/addadmin CHAT_ID NAME');
+      } else {
+        let msg = '👨‍💼 <b>Admin IDs</b>\n\n';
+        for (const admin of admins) {
+          const status = admin.is_active ? '✅' : '❌';
+          msg += `${status} <b>${admin.name || 'Unnamed'}</b>\n   ID: <code>${admin.telegram_chat_id}</code>\n\n`;
+        }
+        msg += `/addadmin CHAT_ID NAME - Add admin\n/removeadmin CHAT_ID - Remove admin`;
+        await sendTelegramMessage(chatId, msg);
+      }
+    }
+
+    else if (text.startsWith('/addadmin ')) {
+      const parts = text.replace('/addadmin ', '').trim().split(' ');
+      if (parts.length < 2) {
+        await sendTelegramMessage(chatId, '❌ Usage: /addadmin CHAT_ID NAME');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      const telegramChatId = parseInt(parts[0]);
+      const name = parts.slice(1).join(' ');
+      
+      if (isNaN(telegramChatId)) {
+        await sendTelegramMessage(chatId, '❌ Invalid Chat ID.');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      await supabase.from('admin_telegram_ids').insert({ telegram_chat_id: telegramChatId, name });
+      await sendTelegramMessage(chatId, `✅ Admin <b>${name}</b> added!`);
+    }
+
+    else if (text.startsWith('/removeadmin ')) {
+      const chatIdToRemove = parseInt(text.replace('/removeadmin ', '').trim());
+      
+      if (isNaN(chatIdToRemove)) {
+        await sendTelegramMessage(chatId, '❌ Invalid Chat ID.');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      await supabase.from('admin_telegram_ids').delete().eq('telegram_chat_id', chatIdToRemove);
+      await sendTelegramMessage(chatId, `✅ Admin removed.`);
+    }
+
+    // ========== USER ACTIONS ==========
+    else if (text.startsWith('/ban ')) {
+      const tgId = parseInt(text.replace('/ban ', '').trim());
+      if (isNaN(tgId)) {
+        await sendTelegramMessage(chatId, '❌ Usage: /ban TELEGRAM_ID');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      await supabase.from('telegram_users').update({ is_banned: true, banned_at: new Date().toISOString() }).eq('telegram_id', tgId);
+      await sendTelegramMessage(chatId, `🚫 User ${tgId} banned.`);
+    }
+
+    else if (text.startsWith('/unban ')) {
+      const tgId = parseInt(text.replace('/unban ', '').trim());
+      if (isNaN(tgId)) {
+        await sendTelegramMessage(chatId, '❌ Usage: /unban TELEGRAM_ID');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      await supabase.from('telegram_users').update({ is_banned: false, banned_at: null }).eq('telegram_id', tgId);
+      await sendTelegramMessage(chatId, `✅ User ${tgId} unbanned.`);
+    }
+
+    else if (text.startsWith('/addcredit ')) {
+      const parts = text.replace('/addcredit ', '').trim().split(' ');
+      if (parts.length < 2) {
+        await sendTelegramMessage(chatId, '❌ Usage: /addcredit TELEGRAM_ID AMOUNT');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      const tgId = parseInt(parts[0]);
+      const amount = parseInt(parts[1]);
+      
+      if (isNaN(tgId) || isNaN(amount)) {
+        await sendTelegramMessage(chatId, '❌ Invalid ID or amount.');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      const { data: user } = await supabase.from('telegram_users').select('balance, first_name').eq('telegram_id', tgId).single();
+      if (!user) {
+        await sendTelegramMessage(chatId, '❌ User not found.');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      await supabase.from('telegram_users').update({ balance: user.balance + amount }).eq('telegram_id', tgId);
+      await sendTelegramMessage(chatId, `✅ Added ${amount} credits to ${user.first_name || tgId}.\nNew balance: ${user.balance + amount}`);
+    }
+
+    else if (text.startsWith('/removecredit ')) {
+      const parts = text.replace('/removecredit ', '').trim().split(' ');
+      if (parts.length < 2) {
+        await sendTelegramMessage(chatId, '❌ Usage: /removecredit TELEGRAM_ID AMOUNT');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      const tgId = parseInt(parts[0]);
+      const amount = parseInt(parts[1]);
+      
+      if (isNaN(tgId) || isNaN(amount)) {
+        await sendTelegramMessage(chatId, '❌ Invalid ID or amount.');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      const { data: user } = await supabase.from('telegram_users').select('balance, first_name').eq('telegram_id', tgId).single();
+      if (!user) {
+        await sendTelegramMessage(chatId, '❌ User not found.');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      const newBalance = Math.max(0, user.balance - amount);
+      await supabase.from('telegram_users').update({ balance: newBalance }).eq('telegram_id', tgId);
+      await sendTelegramMessage(chatId, `✅ Removed ${amount} credits from ${user.first_name || tgId}.\nNew balance: ${newBalance}`);
+    }
+
+    // ========== SEND GPT CREDENTIALS ==========
     else if (text.startsWith('/send_gpt ')) {
       const parts = text.replace('/send_gpt ', '').trim().split(' ');
-      
       if (parts.length < 3) {
         await sendTelegramMessage(chatId, '❌ Usage: /send_gpt ORDER_ID GMAIL PASSWORD');
         return new Response('OK', { headers: corsHeaders });
@@ -458,42 +744,66 @@ serve(async (req) => {
       const gmail = parts[1];
       const password = parts.slice(2).join(' ');
       
-      const { data: order } = await supabase
-        .from('chatgpt_orders')
-        .select('telegram_user_id')
-        .eq('id', orderId)
-        .single();
+      const { data: order } = await supabase.from('chatgpt_orders').select('telegram_user_id').eq('id', orderId).single();
       
       if (!order) {
         await sendTelegramMessage(chatId, '❌ Order not found.');
         return new Response('OK', { headers: corsHeaders });
       }
       
-      // Update order with credentials
-      await supabase
-        .from('chatgpt_orders')
-        .update({
-          status: 'completed',
-          gmail: gmail,
-          password: password,
-          processed_at: new Date().toISOString()
-        })
-        .eq('id', orderId);
+      await supabase.from('chatgpt_orders').update({
+        status: 'completed',
+        gmail,
+        password,
+        processed_at: new Date().toISOString()
+      }).eq('id', orderId);
       
-      // Send credentials to user
-      const credentialsMsg = `✅ <b>Your ChatGPT Account is Ready!</b>\n\n📧 Gmail: <code>${gmail}</code>\n🔑 Password: <code>${password}</code>\n\n⚠️ Please save these credentials securely.`;
+      const sent = await sendToUser(order.telegram_user_id, `✅ <b>Your ChatGPT Account is Ready!</b>
+
+📧 Gmail: <code>${gmail}</code>
+🔑 Password: <code>${password}</code>
+
+⚠️ Save these credentials securely.`);
       
-      const sent = await sendToUser(order.telegram_user_id, credentialsMsg);
-      
-      if (sent) {
-        await sendTelegramMessage(chatId, '✅ Credentials sent successfully!');
-      } else {
-        await sendTelegramMessage(chatId, '⚠️ Credentials saved but user may have blocked the bot.');
-      }
+      await sendTelegramMessage(chatId, sent ? '✅ Credentials sent!' : '⚠️ Saved but user may have blocked bot.');
     }
-    
+
+    // ========== BROADCAST ==========
+    else if (text.startsWith('/broadcast ')) {
+      const broadcastMsg = text.replace('/broadcast ', '').trim();
+      
+      if (!broadcastMsg) {
+        await sendTelegramMessage(chatId, '❌ Usage: /broadcast YOUR_MESSAGE');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      await sendTelegramMessage(chatId, '📤 Broadcasting...');
+      
+      const { data: users } = await supabase.from('telegram_users').select('telegram_id').eq('is_banned', false);
+      
+      if (!users || users.length === 0) {
+        await sendTelegramMessage(chatId, '❌ No users to broadcast to.');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      let success = 0, failed = 0;
+      
+      for (const user of users) {
+        const sent = await sendToUser(user.telegram_id, broadcastMsg);
+        if (sent) success++;
+        else failed++;
+        await new Promise(r => setTimeout(r, 50));
+      }
+      
+      await sendTelegramMessage(chatId, `✅ <b>Broadcast Complete!</b>
+
+📤 Sent: ${success}
+❌ Failed: ${failed}
+📊 Total: ${users.length}`);
+    }
+
     else {
-      await sendTelegramMessage(chatId, `🤖 <b>Unknown command</b>\n\nUse /start to see available commands.`);
+      await sendTelegramMessage(chatId, `❓ Unknown command.\n\n/help - Show all commands`);
     }
 
     return new Response('OK', { headers: corsHeaders });
