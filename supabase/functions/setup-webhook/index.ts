@@ -16,7 +16,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { botToken } = await req.json();
+    const { botToken, webhookPath } = await req.json();
 
     if (!botToken) {
       return new Response(
@@ -47,8 +47,9 @@ serve(async (req) => {
     const deleteResult = await deleteResponse.json();
     console.log('Delete webhook result:', deleteResult);
 
-    // Set the new webhook
-    const webhookUrl = `${supabaseUrl}/functions/v1/telegram-webhook`;
+    // Set the new webhook - use custom path if provided
+    const functionPath = webhookPath || 'telegram-webhook';
+    const webhookUrl = `${supabaseUrl}/functions/v1/${functionPath}`;
     console.log('Setting new webhook to:', webhookUrl);
 
     const setResponse = await fetch(`https://api.telegram.org/bot${botToken}/setWebhook`, {
