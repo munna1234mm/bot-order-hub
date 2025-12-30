@@ -13,6 +13,7 @@ import { ServicesPanel } from '@/components/ServicesPanel';
 import { ReferralBonusPanel } from '@/components/ReferralBonusPanel';
 import { BroadcastMessagePanel } from '@/components/BroadcastMessagePanel';
 import { ChatGPTOrdersPanel } from '@/components/ChatGPTOrdersPanel';
+import { ProductsPanel } from '@/components/ProductsPanel';
 import { useTelegramUsers } from '@/hooks/useTelegramUsers';
 import { useTelegramMessages } from '@/hooks/useTelegramMessages';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -82,6 +83,11 @@ const Index = () => {
         {/* ChatGPT Orders Panel */}
         <div className="mb-6">
           <ChatGPTOrdersPanel />
+        </div>
+
+        {/* Products Panel */}
+        <div className="mb-6">
+          <ProductsPanel />
         </div>
 
         {/* Services Panel */}
