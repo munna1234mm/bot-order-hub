@@ -8,7 +8,18 @@ const corsHeaders = {
 
 // Admin Bot Token
 const ADMIN_BOT_TOKEN = '8561569158:AAFvTLEciz6Q3l9gTMbv1PTxSzDpunw7-hk';
-const ADMIN_CHAT_ID = 6787688428;
+
+// Check if a chat ID is an authorized admin
+async function isAuthorizedAdmin(supabase: any, chatId: number): Promise<boolean> {
+  const { data } = await supabase
+    .from('admin_telegram_ids')
+    .select('id')
+    .eq('telegram_chat_id', chatId)
+    .eq('is_active', true)
+    .maybeSingle();
+  
+  return !!data;
+}
 
 async function sendTelegramMessage(chatId: number, text: string, replyMarkup?: any): Promise<void> {
   const url = `https://api.telegram.org/bot${ADMIN_BOT_TOKEN}/sendMessage`;
@@ -94,7 +105,8 @@ serve(async (req) => {
       const chatId = callbackQuery.message.chat.id;
       const data = callbackQuery.data;
       
-      if (chatId !== ADMIN_CHAT_ID) {
+      const isAdmin = await isAuthorizedAdmin(supabase, chatId);
+      if (!isAdmin) {
         await sendTelegramMessage(chatId, '❌ You are not authorized.');
         return new Response('OK', { headers: corsHeaders });
       }
@@ -242,8 +254,9 @@ serve(async (req) => {
     
     console.log(`Admin bot message from ${chatId}: ${text}`);
 
-    if (chatId !== ADMIN_CHAT_ID) {
-      await sendTelegramMessage(chatId, '❌ You are not authorized to use this bot.');
+    const isAdmin = await isAuthorizedAdmin(supabase, chatId);
+    if (!isAdmin) {
+      await sendTelegramMessage(chatId, '❌ You are not authorized to use this bot.\n\nContact the admin to add your Telegram ID.');
       return new Response('OK', { headers: corsHeaders });
     }
 
