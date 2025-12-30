@@ -15,21 +15,21 @@ export function useAdminTelegramIds() {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
+  const fetchAdmins = async () => {
+    const { data, error } = await supabase
+      .from('admin_telegram_ids')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching admin telegram IDs:', error);
+    } else {
+      setAdmins(data || []);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const fetchAdmins = async () => {
-      const { data, error } = await supabase
-        .from('admin_telegram_ids')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching admin telegram IDs:', error);
-      } else {
-        setAdmins(data || []);
-      }
-      setLoading(false);
-    };
-
     fetchAdmins();
 
     const channel = supabase
@@ -41,22 +41,9 @@ export function useAdminTelegramIds() {
           schema: 'public',
           table: 'admin_telegram_ids',
         },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            setAdmins((prev) => [payload.new as AdminTelegramId, ...prev]);
-          } else if (payload.eventType === 'UPDATE') {
-            setAdmins((prev) =>
-              prev.map((admin) =>
-                admin.id === (payload.new as AdminTelegramId).id
-                  ? (payload.new as AdminTelegramId)
-                  : admin
-              )
-            );
-          } else if (payload.eventType === 'DELETE') {
-            setAdmins((prev) =>
-              prev.filter((admin) => admin.id !== (payload.old as AdminTelegramId).id)
-            );
-          }
+        () => {
+          // Refetch all admins on any change for consistency
+          fetchAdmins();
         }
       )
       .subscribe();
@@ -73,6 +60,7 @@ export function useAdminTelegramIds() {
     });
 
     if (error) {
+      console.error('Error adding admin:', error);
       toast({
         title: 'Error',
         description: error.message,
@@ -80,6 +68,9 @@ export function useAdminTelegramIds() {
       });
       return false;
     }
+
+    // Manually refetch to ensure UI updates
+    await fetchAdmins();
 
     toast({
       title: 'Success',
