@@ -126,8 +126,10 @@ export type Database = {
         Row: {
           admin_message: string | null
           created_at: string
+          credits_cost: number
           gmail: string | null
           id: string
+          order_type: string
           password: string | null
           processed_at: string | null
           processed_by: string | null
@@ -137,8 +139,10 @@ export type Database = {
         Insert: {
           admin_message?: string | null
           created_at?: string
+          credits_cost?: number
           gmail?: string | null
           id?: string
+          order_type?: string
           password?: string | null
           processed_at?: string | null
           processed_by?: string | null
@@ -148,8 +152,10 @@ export type Database = {
         Update: {
           admin_message?: string | null
           created_at?: string
+          credits_cost?: number
           gmail?: string | null
           id?: string
+          order_type?: string
           password?: string | null
           processed_at?: string | null
           processed_by?: string | null
