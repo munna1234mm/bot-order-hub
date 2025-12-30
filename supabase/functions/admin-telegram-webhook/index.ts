@@ -315,6 +315,9 @@ serve(async (req) => {
 /orders - Pending ChatGPT orders
 /canva - Pending Canva requests
 /deposits - Pending deposits
+/allorders - All orders summary
+/orderhistory - Recent order history
+/topusers - Top users by orders
 
 💳 <b>Settings</b>
 /coupons - Manage coupons
@@ -328,6 +331,7 @@ serve(async (req) => {
 /unban ID - Unban user
 /addcredit ID AMOUNT - Add credits
 /removecredit ID AMOUNT - Remove credits
+/setcredit ID AMOUNT - Set exact credits
 /broadcast MSG - Broadcast message
 
 📦 <b>Order Actions</b>
@@ -513,7 +517,194 @@ ${user.is_banned ? '🚫 BANNED' : '✅ Active'}`, {
       }
     }
 
-    // ========== COUPONS ==========
+    // ========== ALL ORDERS SUMMARY ==========
+    else if (text === '/allorders') {
+      const { count: totalChatgpt } = await supabase.from('chatgpt_orders').select('*', { count: 'exact', head: true });
+      const { count: pendingChatgpt } = await supabase.from('chatgpt_orders').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+      const { count: completedChatgpt } = await supabase.from('chatgpt_orders').select('*', { count: 'exact', head: true }).eq('status', 'completed');
+      const { count: rejectedChatgpt } = await supabase.from('chatgpt_orders').select('*', { count: 'exact', head: true }).eq('status', 'rejected');
+      
+      const { count: totalCanva } = await supabase.from('canva_pro_requests').select('*', { count: 'exact', head: true });
+      const { count: pendingCanva } = await supabase.from('canva_pro_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+      const { count: approvedCanva } = await supabase.from('canva_pro_requests').select('*', { count: 'exact', head: true }).eq('status', 'approved');
+      const { count: rejectedCanva } = await supabase.from('canva_pro_requests').select('*', { count: 'exact', head: true }).eq('status', 'rejected');
+      
+      const { count: totalDeposits } = await supabase.from('deposits').select('*', { count: 'exact', head: true });
+      const { count: pendingDeposits } = await supabase.from('deposits').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+      const { count: approvedDeposits } = await supabase.from('deposits').select('*', { count: 'exact', head: true }).eq('status', 'approved');
+      const { count: rejectedDeposits } = await supabase.from('deposits').select('*', { count: 'exact', head: true }).eq('status', 'rejected');
+      
+      // Calculate total revenue from approved deposits
+      const { data: approvedDepositsData } = await supabase.from('deposits').select('amount').eq('status', 'approved');
+      const totalRevenue = approvedDepositsData?.reduce((sum, d) => sum + Number(d.amount), 0) || 0;
+      
+      // ChatGPT Team orders
+      const { count: teamOrders } = await supabase.from('chatgpt_orders').select('*', { count: 'exact', head: true }).eq('order_type', 'chatgpt_team');
+      const { count: plusOrders } = await supabase.from('chatgpt_orders').select('*', { count: 'exact', head: true }).eq('order_type', 'chatgpt_plus');
+      
+      await sendTelegramMessage(chatId, `📊 <b>All Orders Summary</b>
+
+🤖 <b>ChatGPT Orders</b>
+Total: ${totalChatgpt || 0}
+├ Plus: ${plusOrders || 0}
+├ Team: ${teamOrders || 0}
+├ ⏳ Pending: ${pendingChatgpt || 0}
+├ ✅ Completed: ${completedChatgpt || 0}
+└ ❌ Rejected: ${rejectedChatgpt || 0}
+
+🎨 <b>Canva Pro</b>
+Total: ${totalCanva || 0}
+├ ⏳ Pending: ${pendingCanva || 0}
+├ ✅ Approved: ${approvedCanva || 0}
+└ ❌ Rejected: ${rejectedCanva || 0}
+
+💰 <b>Deposits</b>
+Total: ${totalDeposits || 0}
+├ ⏳ Pending: ${pendingDeposits || 0}
+├ ✅ Approved: ${approvedDeposits || 0}
+└ ❌ Rejected: ${rejectedDeposits || 0}
+
+💵 <b>Total Revenue: ৳${totalRevenue.toFixed(2)}</b>
+
+📦 <b>Grand Total: ${(totalChatgpt || 0) + (totalCanva || 0) + (totalDeposits || 0)} orders</b>`);
+    }
+
+    // ========== ORDER HISTORY ==========
+    else if (text === '/orderhistory' || text.startsWith('/orderhistory ')) {
+      const limitStr = text.replace('/orderhistory', '').trim();
+      const limit = parseInt(limitStr) || 20;
+      
+      // Fetch recent orders from all tables
+      const { data: chatgptOrders } = await supabase
+        .from('chatgpt_orders')
+        .select('id, telegram_user_id, status, order_type, created_at, credits_cost')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      
+      const { data: canvaOrders } = await supabase
+        .from('canva_pro_requests')
+        .select('id, telegram_user_id, status, gmail, created_at')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      
+      const { data: depositOrders } = await supabase
+        .from('deposits')
+        .select('id, telegram_user_id, status, amount, created_at')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      
+      // Combine and sort all orders
+      const allOrders: any[] = [];
+      
+      chatgptOrders?.forEach(o => allOrders.push({
+        ...o,
+        type: o.order_type === 'chatgpt_team' ? 'GPT Team' : 'GPT Plus',
+        details: `${o.credits_cost} credits`
+      }));
+      
+      canvaOrders?.forEach(o => allOrders.push({
+        ...o,
+        type: 'Canva',
+        details: o.gmail?.slice(0, 20)
+      }));
+      
+      depositOrders?.forEach(o => allOrders.push({
+        ...o,
+        type: 'Deposit',
+        details: `৳${o.amount}`
+      }));
+      
+      allOrders.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      const recentOrders = allOrders.slice(0, limit);
+      
+      if (recentOrders.length === 0) {
+        await sendTelegramMessage(chatId, '📭 No orders found.');
+      } else {
+        let msg = `📜 <b>Recent Orders (${recentOrders.length})</b>\n\n`;
+        
+        for (const order of recentOrders) {
+          const { data: user } = await supabase
+            .from('telegram_users')
+            .select('first_name, username')
+            .eq('telegram_id', order.telegram_user_id)
+            .single();
+          
+          const statusIcon = order.status === 'completed' || order.status === 'approved' ? '✅' : 
+                            order.status === 'rejected' ? '❌' : '⏳';
+          const date = new Date(order.created_at).toLocaleDateString('en-GB');
+          
+          msg += `${statusIcon} <b>${order.type}</b> | ${order.details}\n`;
+          msg += `   👤 ${user?.first_name || 'Unknown'} | ${date}\n\n`;
+        }
+        
+        msg += `\n/orderhistory 50 - Show more`;
+        await sendTelegramMessage(chatId, msg);
+      }
+    }
+
+    // ========== TOP USERS BY ORDERS ==========
+    else if (text === '/topusers') {
+      // Get all orders grouped by user
+      const { data: chatgptOrders } = await supabase.from('chatgpt_orders').select('telegram_user_id');
+      const { data: canvaOrders } = await supabase.from('canva_pro_requests').select('telegram_user_id');
+      const { data: depositOrders } = await supabase.from('deposits').select('telegram_user_id');
+      
+      // Count orders per user
+      const orderCounts: { [key: number]: { chatgpt: number; canva: number; deposits: number; total: number } } = {};
+      
+      chatgptOrders?.forEach(o => {
+        if (!orderCounts[o.telegram_user_id]) {
+          orderCounts[o.telegram_user_id] = { chatgpt: 0, canva: 0, deposits: 0, total: 0 };
+        }
+        orderCounts[o.telegram_user_id].chatgpt++;
+        orderCounts[o.telegram_user_id].total++;
+      });
+      
+      canvaOrders?.forEach(o => {
+        if (!orderCounts[o.telegram_user_id]) {
+          orderCounts[o.telegram_user_id] = { chatgpt: 0, canva: 0, deposits: 0, total: 0 };
+        }
+        orderCounts[o.telegram_user_id].canva++;
+        orderCounts[o.telegram_user_id].total++;
+      });
+      
+      depositOrders?.forEach(o => {
+        if (!orderCounts[o.telegram_user_id]) {
+          orderCounts[o.telegram_user_id] = { chatgpt: 0, canva: 0, deposits: 0, total: 0 };
+        }
+        orderCounts[o.telegram_user_id].deposits++;
+        orderCounts[o.telegram_user_id].total++;
+      });
+      
+      // Sort by total orders
+      const sortedUsers = Object.entries(orderCounts)
+        .sort((a, b) => b[1].total - a[1].total)
+        .slice(0, 15);
+      
+      if (sortedUsers.length === 0) {
+        await sendTelegramMessage(chatId, '📭 No orders found.');
+      } else {
+        let msg = `🏆 <b>Top Users by Orders</b>\n\n`;
+        let rank = 1;
+        
+        for (const [tgId, counts] of sortedUsers) {
+          const { data: user } = await supabase
+            .from('telegram_users')
+            .select('first_name, username, balance')
+            .eq('telegram_id', parseInt(tgId))
+            .single();
+          
+          const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
+          
+          msg += `${medal} <b>${user?.first_name || 'Unknown'}</b>\n`;
+          msg += `   📦 Total: ${counts.total} (GPT: ${counts.chatgpt}, Canva: ${counts.canva}, Dep: ${counts.deposits})\n`;
+          msg += `   💰 Balance: ${user?.balance || 0} | ID: <code>${tgId}</code>\n\n`;
+          rank++;
+        }
+        
+        await sendTelegramMessage(chatId, msg);
+      }
+    }
     else if (text === '/coupons') {
       const { data: coupons } = await supabase.from('coupon_codes').select('*').order('created_at', { ascending: false }).limit(10);
       
@@ -857,6 +1048,33 @@ To change: /setreferral AMOUNT`);
       const newBalance = Math.max(0, user.balance - amount);
       await supabase.from('telegram_users').update({ balance: newBalance }).eq('telegram_id', tgId);
       await sendTelegramMessage(chatId, `✅ Removed ${amount} credits from ${user.first_name || tgId}.\nNew balance: ${newBalance}`);
+    }
+
+    // ========== SET EXACT CREDITS ==========
+    else if (text.startsWith('/setcredit ')) {
+      const parts = text.replace('/setcredit ', '').trim().split(' ');
+      if (parts.length < 2) {
+        await sendTelegramMessage(chatId, '❌ Usage: /setcredit TELEGRAM_ID AMOUNT\n\nThis sets the exact balance (not add/remove).');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      const tgId = parseInt(parts[0]);
+      const amount = parseInt(parts[1]);
+      
+      if (isNaN(tgId) || isNaN(amount) || amount < 0) {
+        await sendTelegramMessage(chatId, '❌ Invalid ID or amount. Amount must be 0 or positive.');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      const { data: user } = await supabase.from('telegram_users').select('balance, first_name').eq('telegram_id', tgId).single();
+      if (!user) {
+        await sendTelegramMessage(chatId, '❌ User not found.');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      const oldBalance = user.balance;
+      await supabase.from('telegram_users').update({ balance: amount }).eq('telegram_id', tgId);
+      await sendTelegramMessage(chatId, `✅ Credit updated for ${user.first_name || tgId}.\n\n💰 Old: ${oldBalance} → New: ${amount}`);
     }
 
     // ========== APPROVE DEPOSIT WITH CUSTOM CREDITS ==========
