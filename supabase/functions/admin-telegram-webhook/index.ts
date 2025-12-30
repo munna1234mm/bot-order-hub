@@ -157,20 +157,60 @@ serve(async (req) => {
           await sendTelegramMessage(chatId, '✅ Canva Pro request rejected.');
         }
       }
-      // Deposit Actions
+      // Deposit Actions - Show credit selection options
       else if (data.startsWith('approve_deposit_')) {
         const depositId = data.replace('approve_deposit_', '');
         const { data: deposit } = await supabase.from('deposits').select('telegram_user_id, amount').eq('id', depositId).single();
         
         if (deposit) {
+          // Show credit amount selection options
+          const defaultCredits = Math.floor(deposit.amount);
+          await sendTelegramMessage(chatId, `💰 <b>Select Credit Amount</b>\n\nDeposit: ৳${deposit.amount}\nDefault: ${defaultCredits} credits\n\nChoose credits to add:`, {
+            inline_keyboard: [
+              [
+                { text: `${Math.floor(defaultCredits * 0.5)} 💳`, callback_data: `confirm_deposit_${depositId}_${Math.floor(defaultCredits * 0.5)}` },
+                { text: `${defaultCredits} 💳`, callback_data: `confirm_deposit_${depositId}_${defaultCredits}` },
+                { text: `${Math.floor(defaultCredits * 1.5)} 💳`, callback_data: `confirm_deposit_${depositId}_${Math.floor(defaultCredits * 1.5)}` },
+              ],
+              [
+                { text: `${defaultCredits * 2} 💳`, callback_data: `confirm_deposit_${depositId}_${defaultCredits * 2}` },
+                { text: '✏️ Custom', callback_data: `custom_deposit_${depositId}` },
+              ],
+              [
+                { text: '❌ Cancel', callback_data: `cancel_deposit_${depositId}` },
+              ]
+            ]
+          });
+        }
+      }
+      // Confirm deposit with selected credits
+      else if (data.startsWith('confirm_deposit_')) {
+        const parts = data.replace('confirm_deposit_', '').split('_');
+        const depositId = parts[0];
+        const credits = parseInt(parts[1]);
+        
+        const { data: deposit } = await supabase.from('deposits').select('telegram_user_id, amount, status').eq('id', depositId).single();
+        
+        if (deposit && deposit.status === 'pending') {
           await supabase.from('deposits').update({ status: 'approved', processed_at: new Date().toISOString() }).eq('id', depositId);
           const { data: user } = await supabase.from('telegram_users').select('balance').eq('telegram_id', deposit.telegram_user_id).single();
           if (user) {
-            await supabase.from('telegram_users').update({ balance: user.balance + deposit.amount }).eq('telegram_id', deposit.telegram_user_id);
+            await supabase.from('telegram_users').update({ balance: user.balance + credits }).eq('telegram_id', deposit.telegram_user_id);
           }
-          await sendToUser(deposit.telegram_user_id, `✅ Deposit of ৳${deposit.amount} approved! Credits added.`);
-          await sendTelegramMessage(chatId, `✅ Deposit ৳${deposit.amount} approved.`);
+          await sendToUser(deposit.telegram_user_id, `✅ Deposit of ৳${deposit.amount} approved!\n\n💰 ${credits} credits added to your balance.`);
+          await sendTelegramMessage(chatId, `✅ Deposit ৳${deposit.amount} approved.\n💰 ${credits} credits added to user.`);
+        } else {
+          await sendTelegramMessage(chatId, '❌ Deposit already processed or not found.');
         }
+      }
+      // Custom credit input prompt
+      else if (data.startsWith('custom_deposit_')) {
+        const depositId = data.replace('custom_deposit_', '');
+        await sendTelegramMessage(chatId, `📝 Send custom credits:\n\n/approve_deposit ${depositId} AMOUNT\n\nExample: /approve_deposit ${depositId} 50`);
+      }
+      // Cancel deposit selection
+      else if (data.startsWith('cancel_deposit_')) {
+        await sendTelegramMessage(chatId, '❌ Deposit approval cancelled.');
       }
       else if (data.startsWith('reject_deposit_')) {
         const depositId = data.replace('reject_deposit_', '');
@@ -289,6 +329,7 @@ serve(async (req) => {
 /addcredit ID AMOUNT - Add credits
 /removecredit ID AMOUNT - Remove credits
 /send_gpt ID GMAIL PASS - Send GPT creds
+/approve_deposit ID CREDITS - Approve deposit with custom credits
 
 ➕ <b>Add New</b>
 /addcoupon CODE CREDITS - Add coupon
@@ -743,6 +784,43 @@ To change: /setreferral AMOUNT`);
       const newBalance = Math.max(0, user.balance - amount);
       await supabase.from('telegram_users').update({ balance: newBalance }).eq('telegram_id', tgId);
       await sendTelegramMessage(chatId, `✅ Removed ${amount} credits from ${user.first_name || tgId}.\nNew balance: ${newBalance}`);
+    }
+
+    // ========== APPROVE DEPOSIT WITH CUSTOM CREDITS ==========
+    else if (text.startsWith('/approve_deposit ')) {
+      const parts = text.replace('/approve_deposit ', '').trim().split(' ');
+      if (parts.length < 2) {
+        await sendTelegramMessage(chatId, '❌ Usage: /approve_deposit DEPOSIT_ID CREDITS');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      const depositId = parts[0];
+      const credits = parseInt(parts[1]);
+      
+      if (isNaN(credits) || credits <= 0) {
+        await sendTelegramMessage(chatId, '❌ Invalid credits amount.');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      const { data: deposit } = await supabase.from('deposits').select('telegram_user_id, amount, status').eq('id', depositId).single();
+      
+      if (!deposit) {
+        await sendTelegramMessage(chatId, '❌ Deposit not found.');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      if (deposit.status !== 'pending') {
+        await sendTelegramMessage(chatId, '❌ Deposit already processed.');
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      await supabase.from('deposits').update({ status: 'approved', processed_at: new Date().toISOString() }).eq('id', depositId);
+      const { data: user } = await supabase.from('telegram_users').select('balance').eq('telegram_id', deposit.telegram_user_id).single();
+      if (user) {
+        await supabase.from('telegram_users').update({ balance: user.balance + credits }).eq('telegram_id', deposit.telegram_user_id);
+      }
+      await sendToUser(deposit.telegram_user_id, `✅ Deposit of ৳${deposit.amount} approved!\n\n💰 ${credits} credits added to your balance.`);
+      await sendTelegramMessage(chatId, `✅ Deposit ৳${deposit.amount} approved.\n💰 ${credits} credits added to user.`);
     }
 
     // ========== SEND GPT CREDENTIALS ==========

@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTelegramUsers } from '@/hooks/useTelegramUsers';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Bot, Circle, Coins, Ban, CheckCircle, Plus, Minus, Users, Send, Loader2, MessageSquare } from 'lucide-react';
+import { Bot, Circle, Coins, Ban, CheckCircle, Plus, Minus, Users, Send, Loader2, MessageSquare, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -207,12 +208,15 @@ export function TelegramUsersPanel() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className={cn(
-                      "text-sm font-medium truncate",
-                      user.is_banned ? "text-destructive" : "text-foreground"
-                    )}>
+                    <Link 
+                      to={`/user/${user.telegram_id}`}
+                      className={cn(
+                        "text-sm font-medium truncate hover:underline",
+                        user.is_banned ? "text-destructive" : "text-foreground"
+                      )}
+                    >
                       {getDisplayName(user)}
-                    </p>
+                    </Link>
                     {user.is_banned && (
                       <span className="text-[10px] bg-destructive/20 text-destructive px-1.5 py-0.5 rounded font-medium">
                         BANNED
