@@ -308,6 +308,7 @@ serve(async (req) => {
 📊 <b>Dashboard</b>
 /stats - Statistics overview
 /users - User management
+/user ID - View user profile
 /messages - Recent messages
 
 📦 <b>Orders</b>
@@ -322,19 +323,25 @@ serve(async (req) => {
 /referral - Referral bonus
 /admins - Admin IDs
 
-📤 <b>Actions</b>
-/broadcast MSG - Broadcast message
+📤 <b>User Actions</b>
 /ban ID - Ban user
 /unban ID - Unban user
 /addcredit ID AMOUNT - Add credits
 /removecredit ID AMOUNT - Remove credits
-/send_gpt ID GMAIL PASS - Send GPT creds
-/approve_deposit ID CREDITS - Approve deposit with custom credits
+/broadcast MSG - Broadcast message
+
+📦 <b>Order Actions</b>
+/send_gpt ORDER_ID GMAIL PASS - Send GPT creds
+/approve_deposit ID CREDITS - Approve deposit
 
 ➕ <b>Add New</b>
 /addcoupon CODE CREDITS - Add coupon
-/addcmd /CMD RESPONSE - Add command
-/addpayment NAME TYPE NUMBER - Add payment`);
+/addcmd /CMD RESPONSE - Add bot command
+/editcmd /CMD RESPONSE - Edit command
+/delcmd /CMD - Delete command
+/togglecmd /CMD - Toggle command
+/addpayment NAME TYPE NUMBER - Add payment
+/addadmin CHAT_ID NAME - Add admin`);
     }
 
     // ========== STATS ==========
@@ -553,50 +560,116 @@ ${c.is_active ? '✅ Active' : '❌ Inactive'}`, {
       const { data: commands } = await supabase.from('bot_commands').select('*').order('command');
       
       if (!commands || commands.length === 0) {
-        await sendTelegramMessage(chatId, '📭 No commands found.\n\n/addcmd /command Response text');
-      } else {
-        for (const cmd of commands) {
-          await sendTelegramMessage(chatId, `⚡ <b>${cmd.command}</b>
+        await sendTelegramMessage(chatId, `📭 No commands found.
 
-📝 ${cmd.response.slice(0, 100)}${cmd.response.length > 100 ? '...' : ''}
-${cmd.is_active ? '✅ Active' : '❌ Inactive'}`, {
-            inline_keyboard: [[
-              { text: cmd.is_active ? '❌ Disable' : '✅ Enable', callback_data: `toggle_cmd_${cmd.id}` },
-              { text: '🗑 Delete', callback_data: `delete_cmd_${cmd.id}` }
-            ]]
-          });
+<b>Add a new command:</b>
+/addcmd /command Response text
+
+<b>Example:</b>
+/addcmd /hello Welcome to our bot!`);
+      } else {
+        let msg = `⚡ <b>Bot Commands (${commands.length})</b>\n\n`;
+        for (const cmd of commands) {
+          const status = cmd.is_active ? '✅' : '❌';
+          msg += `${status} <b>/${cmd.command}</b>\n   📝 ${cmd.response.slice(0, 50)}${cmd.response.length > 50 ? '...' : ''}\n\n`;
         }
+        msg += `<b>Manage:</b>\n/addcmd /cmd Response - Add\n/editcmd /cmd Response - Edit\n/delcmd /cmd - Delete\n/togglecmd /cmd - Toggle`;
+        await sendTelegramMessage(chatId, msg);
       }
+    }
+
+    else if (text.startsWith('/delcmd ')) {
+      let command = text.replace('/delcmd ', '').trim();
+      if (command.startsWith('/')) {
+        command = command.slice(1);
+      }
+      
+      const { data: existing } = await supabase.from('bot_commands').select('id').eq('command', command).maybeSingle();
+      if (!existing) {
+        await sendTelegramMessage(chatId, `❌ Command <b>/${command}</b> not found!`);
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      await supabase.from('bot_commands').delete().eq('command', command);
+      await sendTelegramMessage(chatId, `✅ Command <b>/${command}</b> deleted!`);
+    }
+
+    else if (text.startsWith('/togglecmd ')) {
+      let command = text.replace('/togglecmd ', '').trim();
+      if (command.startsWith('/')) {
+        command = command.slice(1);
+      }
+      
+      const { data: cmd } = await supabase.from('bot_commands').select('id, is_active').eq('command', command).maybeSingle();
+      if (!cmd) {
+        await sendTelegramMessage(chatId, `❌ Command <b>/${command}</b> not found!`);
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      await supabase.from('bot_commands').update({ is_active: !cmd.is_active }).eq('command', command);
+      await sendTelegramMessage(chatId, `✅ Command <b>/${command}</b> ${cmd.is_active ? 'disabled' : 'enabled'}!`);
     }
 
     else if (text.startsWith('/addcmd ')) {
       const content = text.replace('/addcmd ', '').trim();
       const spaceIndex = content.indexOf(' ');
       if (spaceIndex === -1) {
-        await sendTelegramMessage(chatId, '❌ Usage: /addcmd /command Response text');
+        await sendTelegramMessage(chatId, '❌ Usage: /addcmd /command Response text\n\nExample: /addcmd /help This is the help message');
         return new Response('OK', { headers: corsHeaders });
       }
       
-      const command = content.slice(0, spaceIndex);
+      let command = content.slice(0, spaceIndex);
       const response = content.slice(spaceIndex + 1);
       
-      await supabase.from('bot_commands').insert({ command, response });
-      await sendTelegramMessage(chatId, `✅ Command <b>${command}</b> added!`);
+      // Remove leading slash if present for consistent storage
+      if (command.startsWith('/')) {
+        command = command.slice(1);
+      }
+      
+      // Check if command already exists
+      const { data: existing } = await supabase.from('bot_commands').select('id').eq('command', command).maybeSingle();
+      if (existing) {
+        await sendTelegramMessage(chatId, `❌ Command <b>/${command}</b> already exists!\n\nUse /editcmd /${command} New response`);
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      const { error } = await supabase.from('bot_commands').insert({ command, response });
+      if (error) {
+        console.error('Error adding command:', error);
+        await sendTelegramMessage(chatId, `❌ Error adding command: ${error.message}`);
+      } else {
+        await sendTelegramMessage(chatId, `✅ Command <b>/${command}</b> added!\n\nUsers can now use /${command} in the bot.`);
+      }
     }
 
     else if (text.startsWith('/editcmd ')) {
       const content = text.replace('/editcmd ', '').trim();
       const spaceIndex = content.indexOf(' ');
       if (spaceIndex === -1) {
-        await sendTelegramMessage(chatId, '❌ Usage: /editcmd /command New response text');
+        await sendTelegramMessage(chatId, '❌ Usage: /editcmd /command New response text\n\nExample: /editcmd /help Updated help message');
         return new Response('OK', { headers: corsHeaders });
       }
       
-      const command = content.slice(0, spaceIndex);
+      let command = content.slice(0, spaceIndex);
       const response = content.slice(spaceIndex + 1);
       
-      await supabase.from('bot_commands').update({ response }).eq('command', command);
-      await sendTelegramMessage(chatId, `✅ Command <b>${command}</b> updated!`);
+      // Remove leading slash if present
+      if (command.startsWith('/')) {
+        command = command.slice(1);
+      }
+      
+      const { data: existing } = await supabase.from('bot_commands').select('id').eq('command', command).maybeSingle();
+      if (!existing) {
+        await sendTelegramMessage(chatId, `❌ Command <b>/${command}</b> not found!\n\nUse /addcmd /${command} Response text`);
+        return new Response('OK', { headers: corsHeaders });
+      }
+      
+      const { error } = await supabase.from('bot_commands').update({ response, updated_at: new Date().toISOString() }).eq('command', command);
+      if (error) {
+        await sendTelegramMessage(chatId, `❌ Error updating command: ${error.message}`);
+      } else {
+        await sendTelegramMessage(chatId, `✅ Command <b>/${command}</b> updated!`);
+      }
     }
 
     // ========== PAYMENT METHODS ==========
